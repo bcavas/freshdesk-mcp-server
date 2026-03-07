@@ -1640,50 +1640,50 @@ Execute in this exact order:
 
 | Day | Task | Deliverable | Verification |
 |-----|------|-------------|-------------|
-| 1 | Repository setup, all config files from Section 1 | Compiling, linting TypeScript project | `npm run build` succeeds with zero errors |
-| 1 | Implement `config.ts`, `logger.ts` | Validated config loading | Unit test: missing env vars throw descriptive error |
-| 2 | Implement `FreshdeskClient.request()` with auth | Authenticated API calls | Manual test: `GET /agents/me` returns current agent |
-| 2 | Implement `RateLimiter`, `RetryHandler` | Rate-aware, retry-capable client | Unit tests: header parsing, backoff timing |
-| 3 | Implement `Cache`, `Redactor`, `InputGuard` | All middleware operational | Unit tests per Section 8.1 |
-| 3 | Implement `endpoints.ts`, `pagination.ts` | URL builder and auto-paginator | Unit tests: URL construction, multi-page assembly |
-| 4 | Implement `FreshdeskClient` — all ticket methods | Complete ticket API coverage | Unit tests with nock mocks |
-| 4 | Implement `FreshdeskClient` — contact, agent methods | Complete contact/agent coverage | Unit tests with nock mocks |
-| 5 | Implement `freshdesk-error.ts`, `mcp-error-mapper.ts` | Typed error handling | Unit tests: each HTTP status maps to actionable message |
-| 5 | Integration test: full client against Freshdesk sandbox | Verified API compatibility | Manual + automated: CRUD cycle on sandbox |
+| 1 | [DONE] Repository setup, all config files from Section 1 | Compiling, linting TypeScript project | `npm run build` succeeds with zero errors |
+| 1 | [DONE] Implement `config.ts`, `logger.ts` | Validated config loading | Unit test: missing env vars throw descriptive error |
+| 2 | [DONE] Implement `FreshdeskClient.request()` with auth | Authenticated API calls | Manual test: `GET /agents/me` returns current agent |
+| 2 | [DONE] Implement `RateLimiter`, `RetryHandler` | Rate-aware, retry-capable client | Unit tests: header parsing, backoff timing |
+| 3 | [DONE] Implement `Cache`, `Redactor`, `InputGuard` | All middleware operational | Unit tests per Section 8.1 |
+| 3 | [DONE] Implement `endpoints.ts`, `pagination.ts` | URL builder and auto-paginator | Unit tests: URL construction, multi-page assembly |
+| 4 | [DONE] Implement `FreshdeskClient` — all ticket methods | Complete ticket API coverage | Unit tests with nock mocks |
+| 4 | [DONE] Implement `FreshdeskClient` — contact, agent methods | Complete contact/agent coverage | Unit tests with nock mocks |
+| 5 | [DONE] Implement `freshdesk-error.ts`, `mcp-error-mapper.ts` | Typed error handling | Unit tests: each HTTP status maps to actionable message |
+| 5 | [DONE] Integration test: full client against Freshdesk sandbox | Verified API compatibility | Manual + automated: CRUD cycle on sandbox |
 
 ### Phase 2: Core Toolset (Days 6–10)
 
 | Day | Task | Deliverable | Verification |
 |-----|------|-------------|-------------|
-| 6 | Implement `server.ts` (server factory) | MCP server with tool registration | Integration test: `listTools()` returns tools |
-| 6 | Implement `cli.ts` and `index.ts` entry points | Dual-transport server | `npm run start:stdio` and `npm run start` both work |
-| 7 | Implement ticket tools (5 tools) | `get_ticket`, `list_tickets`, `search_tickets`, `update_ticket`, `create_ticket` | Unit tests + MCP Inspector validation |
-| 8 | Implement conversation tools (3 tools) | `reply_to_ticket`, `add_note`, `list_conversations` | Unit tests + MCP Inspector validation |
-| 8 | Implement contact tools (5 tools) | `get_contact`, `list_contacts`, `search_contacts`, `create_contact`, `update_contact` | Unit tests + MCP Inspector validation |
-| 9 | Implement agent tools (2 tools) | `list_agents`, `get_agent` | Unit tests + MCP Inspector |
-| 9 | Tool registry, toolset resolution | Configurable toolset loading | Integration test: enabling/disabling toolsets changes tool count |
-| 10 | Full integration test suite | Server lifecycle tests passing | `npm run test` — all green, coverage ≥ 80% |
-| 10 | MCP Inspector end-to-end validation | Every core tool callable via Inspector | Manual: run Inspector, invoke each tool |
+| 6 | [DONE] Implement `server.ts` (server factory) | MCP server with tool registration | Integration test: `listTools()` returns tools |
+| 6 | [DONE] Implement `cli.ts` and `index.ts` entry points | Dual-transport server | `npm run start:stdio` and `npm run start` both work |
+| 7 | [DONE] Implement ticket tools (5 tools) | `get_ticket`, `list_tickets`, `search_tickets`, `update_ticket`, `create_ticket` | Unit tests + MCP Inspector validation |
+| 8 | [DONE] Implement conversation tools (3 tools) | `reply_to_ticket`, `add_note`, `list_conversations` | Unit tests + MCP Inspector validation |
+| 8 | [DONE] Implement contact tools (5 tools) | `get_contact`, `list_contacts`, `search_contacts`, `create_contact`, `update_contact` | Unit tests + MCP Inspector validation |
+| 9 | [DONE] Implement agent tools (2 tools) | `list_agents`, `get_agent` | Unit tests + MCP Inspector |
+| 9 | [DONE] Tool registry, toolset resolution | Configurable toolset loading | Integration test: enabling/disabling toolsets changes tool count |
+| 10 | [DONE] Full integration test suite | Server lifecycle tests passing | `npm run test` — all green, coverage ≥ 80% |
+| 10 | [DONE] MCP Inspector end-to-end validation | Every core tool callable via Inspector | Manual: run Inspector, invoke each tool |
 
 ### Phase 3: Extended Toolsets (Days 11–16)
 
 | Day | Task | Deliverable | Verification |
 |-----|------|-------------|-------------|
-| 11 | KB toolset — article tools (6 tools) | Solution CRUD + canned responses | Unit tests + Inspector |
-| 12 | Analytics toolset (4 tools) | CSAT ratings + time entries | Unit tests + Inspector |
-| 13 | Bulk toolset (3 tools) | Bulk update, delete, merge | Unit tests (mock async job responses) |
-| 14 | Admin toolset (3 tools) | Groups, fields, SLA policies | Unit tests + Inspector |
-| 15 | Cross-toolset integration tests | All 33 tools operational | Full test suite passing |
+| 11 | [DONE] KB toolset — article tools (6 tools) | Solution CRUD + canned responses | Unit tests + Inspector |
+| 12 | [DONE] Analytics toolset (4 tools) | CSAT ratings + time entries | Unit tests + Inspector |
+| 13 | [DONE] Bulk toolset (3 tools) | Bulk update, delete, merge | Unit tests (mock async job responses) |
+| 14 | [DONE] Admin toolset (3 tools) | Groups, fields, SLA policies | Unit tests + Inspector |
+| 15 | [DONE] Cross-toolset integration tests | All 33 tools operational | Full test suite passing |
 | 16 | Performance optimization: cache tuning, response sizing | Sub-200ms median tool latency (cached) | k6 load test: 50 concurrent clients |
 
 ### Phase 4: Deployment and Distribution (Days 17–22)
 
 | Day | Task | Deliverable | Verification |
 |-----|------|-------------|-------------|
-| 17 | Azure Functions setup: Bicep template, deploy first version | Live `/mcp` endpoint on Azure | `curl https://your-app.azurewebsites.net/health` returns 200 |
-| 18 | Azure Key Vault integration, managed identity | Secrets not in env vars | App settings reference Key Vault, API calls succeed |
-| 18 | GitHub Actions CI/CD | Automated test + deploy pipeline | Push to main triggers deploy, PR triggers CI |
-| 19 | npm publish preparation: README, TOOLS.md, CONFIGURATION.md | Publish-ready package | `npm pack` produces clean tarball |
+| 17 | [DONE] Azure Functions setup: Bicep template, deploy first version | Live `/mcp` endpoint on Azure | `curl https://your-app.azurewebsites.net/health` returns 200 |
+| 18 | [DONE] Azure Key Vault integration, managed identity | Secrets not in env vars | App settings reference Key Vault, API calls succeed |
+| 18 | [DONE] GitHub Actions CI/CD | Automated test + deploy pipeline | Push to main triggers deploy, PR triggers CI |
+| 19 | [DONE] npm publish preparation: README, TOOLS.md, CONFIGURATION.md | Publish-ready package | `npm pack` produces clean tarball |
 | 19 | Publish to npm registry | `freshdesk-mcp-server` on npm | `npx freshdesk-mcp-server` runs successfully |
 | 20 | Register on Official MCP Registry, Smithery, PulseMCP, mcp.so | Listed on 4+ registries | Searchable on each platform |
 | 21 | MCPize integration (if monetizing) | Credit-based gating operational | Free tier: 100 calls; Pro tier: unlimited |
