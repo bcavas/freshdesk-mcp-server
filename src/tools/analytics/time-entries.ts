@@ -30,7 +30,7 @@ export function registerTimeEntryTools(client: FreshdeskClient, logger: Logger) 
     return [
         {
             name: 'list_time_entries',
-            description: 'List all time tracking entries for a specific ticket.',
+            description: 'List all time tracking entries for a specific ticket. Results are cached for 5 minutes.',
             inputSchema: ListTimeEntriesInputSchema,
             annotations: {
                 readOnlyHint: true,

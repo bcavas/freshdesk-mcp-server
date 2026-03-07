@@ -58,7 +58,7 @@ export function registerArticleTools(client: FreshdeskClient, logger: Logger) {
         {
             name: 'list_solution_categories',
             description:
-                'List all solution categories in the Freshdesk knowledge base. Returns category IDs needed to list articles.',
+                'List all solution categories in the Freshdesk knowledge base. Returns category IDs needed to list articles. Results are cached for 1 hour.',
             inputSchema: ListSolutionCategoriesInputSchema,
             annotations: {
                 readOnlyHint: true,
@@ -83,7 +83,7 @@ export function registerArticleTools(client: FreshdeskClient, logger: Logger) {
         {
             name: 'list_solution_articles',
             description:
-                'List knowledge base articles in a specific folder. Use list_solution_categories first to find folder IDs.',
+                'List knowledge base articles in a specific folder. Use list_solution_categories first to find folder IDs. Results are cached for 30 minutes.',
             inputSchema: ListSolutionArticlesInputSchema,
             annotations: {
                 readOnlyHint: true,

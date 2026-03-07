@@ -182,6 +182,8 @@ export class FreshdeskClient {
         const perPage = params?.per_page ?? 30;
         const data = await this.request<Ticket[]>('GET', endpoints.tickets(), {
             params: queryParams,
+            cacheKey: `tickets:list:${JSON.stringify(queryParams)}`,
+            cacheTtl: CacheClass.TTL.TICKET_LISTS,
         });
 
         return {
@@ -193,18 +195,21 @@ export class FreshdeskClient {
     }
 
     async createTicket(data: CreateTicketInput): Promise<Ticket> {
+        this.cache.invalidatePrefix('tickets:list:');
         return this.request<Ticket>('POST', endpoints.tickets(), { body: data });
     }
 
     async updateTicket(id: number, data: UpdateTicketInput): Promise<Ticket> {
         this.cache.invalidate(`ticket:${id}`);
         this.cache.invalidatePrefix(`ticket:${id}:`);
+        this.cache.invalidatePrefix('tickets:list:');
         return this.request<Ticket>('PUT', endpoints.ticket(id), { body: data });
     }
 
     async deleteTicket(id: number): Promise<void> {
         this.cache.invalidate(`ticket:${id}`);
         this.cache.invalidatePrefix(`ticket:${id}:`);
+        this.cache.invalidatePrefix('tickets:list:');
         await this.request<void>('DELETE', endpoints.ticket(id));
     }
 
@@ -218,6 +223,11 @@ export class FreshdeskClient {
         ticketIds: number[],
         properties: Partial<Ticket>,
     ): Promise<JobStatus> {
+        ticketIds.forEach((id) => {
+            this.cache.invalidate(`ticket:${id}`);
+            this.cache.invalidatePrefix(`ticket:${id}:`);
+        });
+        this.cache.invalidatePrefix('tickets:list:');
         return this.request<JobStatus>('POST', endpoints.ticketBulkUpdate(), {
             body: { bulk_action: { ids: ticketIds, properties } },
         });
@@ -225,16 +235,23 @@ export class FreshdeskClient {
 
     // Conversation operations
     async listConversations(ticketId: number): Promise<Conversation[]> {
-        return this.request<Conversation[]>('GET', endpoints.ticketConversations(ticketId));
+        return this.request<Conversation[]>('GET', endpoints.ticketConversations(ticketId), {
+            cacheKey: `ticket:${ticketId}:conversations`,
+            cacheTtl: CacheClass.TTL.CONVERSATIONS,
+        });
     }
 
     async replyToTicket(ticketId: number, body: ReplyInput): Promise<Conversation> {
+        this.cache.invalidate(`ticket:${ticketId}`);
+        this.cache.invalidatePrefix(`ticket:${ticketId}:conversations`);
         return this.request<Conversation>('POST', endpoints.ticketReply(ticketId), {
             body,
         });
     }
 
     async addNote(ticketId: number, body: NoteInput): Promise<Conversation> {
+        this.cache.invalidate(`ticket:${ticketId}`);
+        this.cache.invalidatePrefix(`ticket:${ticketId}:conversations`);
         return this.request<Conversation>('POST', endpoints.ticketNote(ticketId), { body });
     }
 
@@ -349,18 +366,24 @@ export class FreshdeskClient {
 
     // Solutions (Knowledge Base)
     async listSolutionCategories(): Promise<SolutionCategory[]> {
-        return this.request<SolutionCategory[]>('GET', endpoints.solutionCategories());
+        return this.request<SolutionCategory[]>('GET', endpoints.solutionCategories(), {
+            cacheKey: 'solution_categories:all',
+            cacheTtl: CacheClass.TTL.SOLUTION_CATEGORIES,
+        });
     }
 
     async listSolutionFolders(categoryId: number): Promise<SolutionFolder[]> {
-        return this.request<SolutionFolder[]>(
-            'GET',
-            endpoints.solutionFolders(categoryId),
-        );
+        return this.request<SolutionFolder[]>('GET', endpoints.solutionFolders(categoryId), {
+            cacheKey: `solution_category:${categoryId}:folders`,
+            cacheTtl: CacheClass.TTL.SOLUTION_FOLDERS,
+        });
     }
 
     async listSolutionArticles(folderId: number): Promise<SolutionArticle[]> {
-        return this.request<SolutionArticle[]>('GET', endpoints.solutionArticles(folderId));
+        return this.request<SolutionArticle[]>('GET', endpoints.solutionArticles(folderId), {
+            cacheKey: `solution_folder:${folderId}:articles`,
+            cacheTtl: CacheClass.TTL.SOLUTION_ARTICLES,
+        });
     }
 
     async getSolutionArticle(id: number): Promise<SolutionArticle> {
@@ -371,6 +394,7 @@ export class FreshdeskClient {
         folderId: number,
         data: CreateArticleInput,
     ): Promise<SolutionArticle> {
+        this.cache.invalidate(`solution_folder:${folderId}:articles`);
         return this.request<SolutionArticle>('POST', endpoints.solutionArticles(folderId), {
             body: { solution_article: data },
         });
@@ -380,12 +404,19 @@ export class FreshdeskClient {
         id: number,
         data: UpdateArticleInput,
     ): Promise<SolutionArticle> {
+        this.cache.invalidate(`solution_article:${id}`);
+        // We cannot easily invalidate the list cache here without knowing the folder ID,
+        // but since we don't cache individual articles locally yet, we assume the list cache
+        // might be stale. For simplicity, we can invalidate all article lists:
+        this.cache.invalidatePrefix('solution_folder:');
         return this.request<SolutionArticle>('PUT', endpoints.solutionArticle(id), {
             body: { solution_article: data },
         });
     }
 
     async deleteSolutionArticle(id: number): Promise<void> {
+        this.cache.invalidate(`solution_article:${id}`);
+        this.cache.invalidatePrefix('solution_folder:');
         await this.request<void>('DELETE', endpoints.solutionArticle(id));
     }
 
@@ -427,10 +458,14 @@ export class FreshdeskClient {
 
     // Time Entries
     async listTimeEntries(ticketId: number): Promise<TimeEntry[]> {
-        return this.request<TimeEntry[]>('GET', endpoints.ticketTimeEntries(ticketId));
+        return this.request<TimeEntry[]>('GET', endpoints.ticketTimeEntries(ticketId), {
+            cacheKey: `ticket:${ticketId}:time_entries`,
+            cacheTtl: CacheClass.TTL.TIME_ENTRIES,
+        });
     }
 
     async createTimeEntry(ticketId: number, data: CreateTimeEntryInput): Promise<TimeEntry> {
+        this.cache.invalidate(`ticket:${ticketId}:time_entries`);
         return this.request<TimeEntry>('POST', endpoints.ticketTimeEntries(ticketId), {
             body: data,
         });
@@ -456,6 +491,9 @@ export class FreshdeskClient {
     async listAutomationRules(
         type: 'ticket_creation' | 'time_triggers' | 'ticket_update',
     ): Promise<AutomationRule[]> {
-        return this.request<AutomationRule[]>('GET', endpoints.automationRules(type));
+        return this.request<AutomationRule[]>('GET', endpoints.automationRules(type), {
+            cacheKey: `automation_rules:${type}`,
+            cacheTtl: CacheClass.TTL.AUTOMATION_RULES,
+        });
     }
 }

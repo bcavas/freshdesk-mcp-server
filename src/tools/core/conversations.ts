@@ -34,7 +34,7 @@ export function registerConversationTools(client: FreshdeskClient, logger: Logge
         {
             name: 'list_conversations',
             description:
-                'List all conversations (replies and notes) for a ticket. Returns the full email thread and any agent notes.',
+                'List all conversations (replies and notes) for a ticket. Returns the full email thread and any agent notes. Results are cached for 1 minute.',
             inputSchema: ListConversationsInputSchema,
             annotations: {
                 readOnlyHint: true,

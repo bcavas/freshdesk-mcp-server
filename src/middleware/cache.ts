@@ -15,7 +15,14 @@ export class Cache {
         SLA_POLICIES: 30 * 60 * 1000, // 30 min
         CANNED_RESPONSES: 15 * 60 * 1000, // 15 min
         TICKETS: 2 * 60 * 1000, // 2 min — changes frequently
+        TICKET_LISTS: 60 * 1000, // 1 min — frequently changes, heavily queried
+        CONVERSATIONS: 60 * 1000, // 1 min
         CONTACTS: 5 * 60 * 1000, // 5 min
+        SOLUTION_CATEGORIES: 60 * 60 * 1000, // 1 hour
+        SOLUTION_FOLDERS: 60 * 60 * 1000, // 1 hour
+        SOLUTION_ARTICLES: 30 * 60 * 1000, // 30 min
+        TIME_ENTRIES: 5 * 60 * 1000, // 5 min
+        AUTOMATION_RULES: 60 * 60 * 1000, // 1 hour
         SEARCH: 0, // Never cache search results
     };
 

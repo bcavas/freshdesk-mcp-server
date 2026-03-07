@@ -154,7 +154,7 @@ export function registerTicketTools(client: FreshdeskClient, logger: Logger) {
         {
             name: 'list_tickets',
             description:
-                'List Freshdesk tickets with filtering, sorting, and pagination. Returns up to 100 tickets per page. Use updated_since to get recent changes only. Default sort: newest first.',
+                'List Freshdesk tickets with filtering, sorting, and pagination. Returns up to 100 tickets per page. Use updated_since to get recent changes only. Default sort: newest first. Results are cached for 1 minute.',
             inputSchema: ListTicketsInputSchema,
             annotations: {
                 readOnlyHint: true,

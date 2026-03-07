@@ -15,7 +15,7 @@ export function registerAutomationTools(client: FreshdeskClient, logger: Logger)
         {
             name: 'list_automation_rules',
             description:
-                'List Freshdesk automation rules by type. Types: ticket_creation (runs when ticket is created), time_triggers (runs on schedule), ticket_update (runs when ticket is updated).',
+                'List Freshdesk automation rules by type. Types: ticket_creation (runs when ticket is created), time_triggers (runs on schedule), ticket_update (runs when ticket is updated). Results are cached for 1 hour.',
             inputSchema: ListAutomationRulesInputSchema,
             annotations: {
                 readOnlyHint: true,
