@@ -1,0 +1,39 @@
+{
+    "unauthorized": {
+        "code": "invalid_credentials",
+        "message": "You have to be logged in to perform this action.",
+        "description": "You have to be logged in to perform this action."
+    },
+    "forbidden": {
+        "code": "access_denied",
+        "message": "You are not authorized to perform this action.",
+        "description": "You are not authorized to perform this action."
+    },
+    "not_found": {
+        "code": "record_not_found",
+        "message": "Record Not Found",
+        "description": "The resource you requested could not be found."
+    },
+    "rate_limited": {
+        "code": "too_many_requests",
+        "message": "You have made too many API calls.",
+        "description": "Retry your API request in 60 seconds."
+    },
+    "validation_error": {
+        "code": "invalid_value",
+        "message": "Validation failed",
+        "description": "One or more values are invalid.",
+        "errors": [
+            {
+                "field": "email",
+                "message": "is invalid",
+                "code": "invalid_value"
+            }
+        ]
+    },
+    "server_error": {
+        "code": "internal_error",
+        "message": "Internal Server Error",
+        "description": "An unexpected error occurred. Please try again."
+    }
+}

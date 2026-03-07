@@ -1,0 +1,282 @@
+
+> freshdesk-mcp-server@0.1.0 test
+> vitest run --reporter=verbose
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/benjamincavas/projects/freshdesk-mcp-server[39m
+
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mredacts top-level fields[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mredacts nested object fields[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mdoes not redact null values[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mdoes not alter unrelated fields[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22muses custom field list from constructor[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mGetContactInputSchema[2m > [22mrequires a positive integer contact_id[32m 69[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mCreateContactInputSchema[2m > [22mrequires name[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mCreateContactInputSchema[2m > [22mvalidates email format if provided[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mUpdateContactInputSchema[2m > [22mrequires at least one field besides contact_id[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/kb/articles.test.ts[2m > [22mArticle Tool Schemas[2m > [22mCreateSolutionArticleInputSchema[2m > [22mrequires folder_id, title, and description[32m 75[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/kb/articles.test.ts[2m > [22mArticle Tool Schemas[2m > [22mCreateSolutionArticleInputSchema[2m > [22mdefaults status to 2 (published)[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/kb/articles.test.ts[2m > [22mArticle Tool Schemas[2m > [22mDeleteSolutionArticleInputSchema[2m > [22mrequires article_id[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mBulkUpdateTicketsInputSchema[2m > [22mrequires at least 1 ticket_id[32m 90[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mBulkUpdateTicketsInputSchema[2m > [22mcaps at 25 ticket_ids[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mBulkUpdateTicketsInputSchema[2m > [22mrequires at least one property beside ticket_ids[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mDeleteTicketInputSchema[2m > [22mrequires a positive integer ticket_id[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/conversations.test.ts[2m > [22mConversation Tool Schemas[2m > [22mReplyToTicketInputSchema[2m > [22mrequires ticket_id and body[32m 90[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/conversations.test.ts[2m > [22mConversation Tool Schemas[2m > [22mReplyToTicketInputSchema[2m > [22mvalidates cc_emails format[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/conversations.test.ts[2m > [22mConversation Tool Schemas[2m > [22mAddNoteInputSchema[2m > [22mdefaults private to true[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mreturns stored value before expiry[32m 3[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mreturns undefined for missing key[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mreturns undefined after TTL expiry[32m 101[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mdoes not cache when TTL is 0[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22minvalidate()[2m > [22mremoves specific key[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22minvalidatePrefix()[2m > [22mremoves all keys with matching prefix[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mclear()[2m > [22mremoves all entries[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mTTL constants[2m > [22mexports expected TTL values[32m 0[2mms[22m[39m
+[90mstdout[2m | tests/integration/tool-execution.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+[90mstdout[2m | tests/unit/tools/core/tickets.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — safe inputs[2m > [22mpasses a normal ticket query[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — safe inputs[2m > [22mpasses a normal ticket subject[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — safe inputs[2m > [22mpasses numeric and boolean inputs without inspection[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects <IMPORTANT> tag[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects "ignore previous instructions"[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects "you are now" pattern[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects system prompt prefix[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects [INST] tag[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects zero-width space[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mincludes the offending field name in the reason[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mupdateFromHeaders()[2m > [22mparses rate limit headers correctly[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mupdateFromHeaders()[2m > [22mhandles missing headers gracefully[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mreturns allowed=true when remaining exceeds buffer[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mreturns allowed=true with delay when remaining is below buffer[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mreturns allowed=false when remaining is 0[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mallows all requests before first header update (Infinity remaining)[32m 0[2mms[22m[39m
+[90mstdout[2m | tests/integration/server-lifecycle.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mcollects all pages until hasMore is false[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mstops at maxPages limit even if hasMore is true[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mstops when token budget is exceeded[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mcaps perPage at 100[32m 0[2mms[22m[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mreturns a ticket on success[33m 369[2mms[22m[39m
+[31m   → You have to be logged in to perform this action.[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mredacts phone field from contact responses[33m 534[2mms[22m[39m
+[31m   → You have to be logged in to perform this action.[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mthrows FreshdeskApiError on 404[33m 419[2mms[22m[39m
+[31m   → expected FreshdeskApiError: You have to be logged … { …(4) } to match object { statusCode: 404, …(1) }
+(3 matching properties omitted from actual)[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mthrows FreshdeskApiError on 401[32m 185[2mms[22m[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22muses cache on second identical request[32m 185[2mms[22m[39m
+[31m   → You have to be logged in to perform this action.[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mlistTickets()[2m > [22mreturns paginated results[33m 564[2mms[22m[39m
+[31m   → You have to be logged in to perform this action.[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mcreateTicket()[2m > [22mcreates a ticket successfully[33m 363[2mms[22m[39m
+[31m   → You have to be logged in to perform this action.[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22msearchTickets()[2m > [22mreturns search results with total count[32m 198[2mms[22m[39m
+[31m   → You have to be logged in to perform this action.[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mrate limiter integration[2m > [22mrespects buffer threshold and does not throw when remaining is above buffer[32m 196[2mms[22m[39m
+[31m   → promise rejected "FreshdeskApiError: You have to be logged … { …(4) }" instead of resolving[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/integration/server-lifecycle.test.ts[2m [ tests/integration/server-lifecycle.test.ts ][22m
+[41m[1m FAIL [22m[49m tests/integration/tool-execution.test.ts[2m [ tests/integration/tool-execution.test.ts ][22m
+[41m[1m FAIL [22m[49m tests/unit/tools/core/tickets.test.ts[2m [ tests/unit/tools/core/tickets.test.ts ][22m
+[31m[1mZodError[22m: [
+  {
+    "origin": "string",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "freshdesk",
+      "domain"
+    ],
+    "message": "FRESHDESK_DOMAIN is required"
+  },
+  {
+    "origin": "string",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "freshdesk",
+      "apiKey"
+    ],
+    "message": "FRESHDESK_API_KEY is required"
+  }
+][39m
+[36m [2m❯[22m loadConfig src/config.ts:[2m64:39[22m[39m
+    [90m 62| [39m        }[33m,[39m
+    [90m 63| [39m    }[33m;[39m
+    [90m 64| [39m    [35mreturn[39m [33mObject[39m[33m.[39m[34mfreeze[39m([33mConfigSchema[39m[33m.[39m[34mparse[39m(raw))[33m;[39m
+    [90m   | [39m                                      [31m^[39m
+    [90m 65| [39m}
+    [90m 66| [39m
+[90m [2m❯[22m src/logger.ts:[2m4:16[22m[39m
+[90m [2m❯[22m src/server.ts:[2m3:1[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ _zod: { def: [ { origin: 'string', code: 'too_small', minimum: 1, inclusive: true, path: [ 'freshdesk', 'domain' ], message: 'FRESHDESK_DOMAIN is required' }, { origin: 'string', code: 'too_small', minimum: 1, inclusive: true, path: [ 'freshdesk', 'apiKey' ], message: 'FRESHDESK_API_KEY is required' } ], constr: 'Function<ZodError>', traits: { constructor: 'Function<Set>', has: 'Function<has>', add: 'Function<add>', delete: 'Function<delete>', clear: 'Function<clear>', entries: 'Function<entries>', forEach: 'Function<forEach>', size: 2, values: 'Function<values>', keys: 'Function<values>', union: 'Function<union>', intersection: 'Function<intersection>', difference: 'Function<difference>', symmetricDifference: 'Function<symmetricDifference>', isSubsetOf: 'Function<isSubsetOf>', isSupersetOf: 'Function<isSupersetOf>', isDisjointFrom: 'Function<isDisjointFrom>' }, deferred: [] }, issues: [ { origin: 'string', code: 'too_small', minimum: 1, inclusive: true, path: [ 'freshdesk', 'domain' ], message: 'FRESHDESK_DOMAIN is required' }, { origin: 'string', code: 'too_small', minimum: 1, inclusive: true, path: [ 'freshdesk', 'apiKey' ], message: 'FRESHDESK_API_KEY is required' } ], format: 'Function<value>', flatten: 'Function<value>', addIssue: 'Function<value>', addIssues: 'Function<value>', isEmpty: false }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mreturns a ticket on success
+[31m[1mFreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+    [90m 24| [39m            (body[33m?.[39mdescription [35mas[39m string [33m|[39m undefined) [33m??[39m
+    [90m 25| [39m            [32m`Freshdesk API error: HTTP [39m[36m${[39mstatus[36m}[39m[32m`[39m[33m;[39m
+    [90m 26| [39m        [35mreturn[39m [35mnew[39m [33mFreshdeskApiError[39m(
+    [90m   | [39m               [31m^[39m
+    [90m 27| [39m            status[33m,[39m
+    [90m 28| [39m            errorCode[33m,[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m60:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mredacts phone field from contact responses
+[31m[1mFreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+    [90m 24| [39m            (body[33m?.[39mdescription [35mas[39m string [33m|[39m undefined) [33m??[39m
+    [90m 25| [39m            [32m`Freshdesk API error: HTTP [39m[36m${[39mstatus[36m}[39m[32m`[39m[33m;[39m
+    [90m 26| [39m        [35mreturn[39m [35mnew[39m [33mFreshdeskApiError[39m(
+    [90m   | [39m               [31m^[39m
+    [90m 27| [39m            status[33m,[39m
+    [90m 28| [39m            errorCode[33m,[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m83:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mthrows FreshdeskApiError on 404
+[31m[1mAssertionError[22m: expected FreshdeskApiError: You have to be logged … { …(4) } to match object { statusCode: 404, …(1) }
+(3 matching properties omitted from actual)[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- {[39m
+[32m-   "errorCode": "record_not_found",[39m
+[32m-   "statusCode": 404,[39m
+[31m+ FreshdeskApiError {[39m
+[31m+   "errorCode": "invalid_credentials",[39m
+[31m+   "statusCode": 401,[39m
+[2m  }[22m
+
+[36m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m95:13[22m[39m
+    [90m 93| [39m            [35mconst[39m client [33m=[39m [34mcreateClient[39m()[33m;[39m
+    [90m 94| [39m            await expect(client.getTicket(99999)).rejects.toThrow(Fres…
+    [90m 95| [39m            await expect(client.getTicket(99999)).rejects.toMatchObjec…
+    [90m   | [39m            [31m^[39m
+    [90m 96| [39m                statusCode[33m:[39m [34m404[39m[33m,[39m
+    [90m 97| [39m                errorCode[33m:[39m [32m'record_not_found'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22muses cache on second identical request
+[31m[1mFreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+    [90m 24| [39m            (body[33m?.[39mdescription [35mas[39m string [33m|[39m undefined) [33m??[39m
+    [90m 25| [39m            [32m`Freshdesk API error: HTTP [39m[36m${[39mstatus[36m}[39m[32m`[39m[33m;[39m
+    [90m 26| [39m        [35mreturn[39m [35mnew[39m [33mFreshdeskApiError[39m(
+    [90m   | [39m               [31m^[39m
+    [90m 27| [39m            status[33m,[39m
+    [90m 28| [39m            errorCode[33m,[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m122:27[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mlistTickets()[2m > [22mreturns paginated results
+[31m[1mFreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+    [90m 24| [39m            (body[33m?.[39mdescription [35mas[39m string [33m|[39m undefined) [33m??[39m
+    [90m 25| [39m            [32m`Freshdesk API error: HTTP [39m[36m${[39mstatus[36m}[39m[32m`[39m[33m;[39m
+    [90m 26| [39m        [35mreturn[39m [35mnew[39m [33mFreshdeskApiError[39m(
+    [90m   | [39m               [31m^[39m
+    [90m 27| [39m            status[33m,[39m
+    [90m 28| [39m            errorCode[33m,[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m FreshdeskClient.listTickets src/client/freshdesk-client.ts:[2m183:22[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m136:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mcreateTicket()[2m > [22mcreates a ticket successfully
+[31m[1mFreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+    [90m 24| [39m            (body[33m?.[39mdescription [35mas[39m string [33m|[39m undefined) [33m??[39m
+    [90m 25| [39m            [32m`Freshdesk API error: HTTP [39m[36m${[39mstatus[36m}[39m[32m`[39m[33m;[39m
+    [90m 26| [39m        [35mreturn[39m [35mnew[39m [33mFreshdeskApiError[39m(
+    [90m   | [39m               [31m^[39m
+    [90m 27| [39m            status[33m,[39m
+    [90m 28| [39m            errorCode[33m,[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m150:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22msearchTickets()[2m > [22mreturns search results with total count
+[31m[1mFreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+    [90m 24| [39m            (body[33m?.[39mdescription [35mas[39m string [33m|[39m undefined) [33m??[39m
+    [90m 25| [39m            [32m`Freshdesk API error: HTTP [39m[36m${[39mstatus[36m}[39m[32m`[39m[33m;[39m
+    [90m 26| [39m        [35mreturn[39m [35mnew[39m [33mFreshdeskApiError[39m(
+    [90m   | [39m               [31m^[39m
+    [90m 27| [39m            status[33m,[39m
+    [90m 28| [39m            errorCode[33m,[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m169:28[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mrate limiter integration[2m > [22mrespects buffer threshold and does not throw when remaining is above buffer
+[31m[1mAssertionError[22m: promise rejected "FreshdeskApiError: You have to be logged … { …(4) }" instead of resolving[39m
+[36m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m186:45[22m[39m
+    [90m184| [39m
+    [90m185| [39m            [35mconst[39m client [33m=[39m [34mcreateClient[39m()[33m;[39m
+    [90m186| [39m            [35mawait[39m [34mexpect[39m(client[33m.[39m[34mgetTicket[39m([34m1[39m))[33m.[39mresolves[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m   | [39m                                            [31m^[39m
+    [90m187| [39m        })[33m;[39m
+    [90m188| [39m    })[33m;[39m
+
+[31m[1mCaused by: FreshdeskApiError[22m: You have to be logged in to perform this action.[39m
+[36m [2m❯[22m Function.fromResponse src/errors/freshdesk-error.ts:[2m26:16[22m[39m
+[90m [2m❯[22m src/client/freshdesk-client.ts:[2m135:41[22m[39m
+[90m [2m❯[22m RetryHandler.execute src/middleware/retry.ts:[2m22:24[22m[39m
+[90m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m186:13[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ statusCode: 401, errorCode: 'invalid_credentials', retryAfter: undefined, details: undefined }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m9 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m48 passed[39m[22m[90m (56)[39m
+[2m   Start at [22m 19:52:41
+[2m   Duration [22m 3.37s[2m (transform 642ms, setup 0ms, import 629ms, tests 3.48s, environment 1ms)[22m
+

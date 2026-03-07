@@ -1,0 +1,212 @@
+
+> freshdesk-mcp-server@0.1.0 test
+> vitest run --reporter=verbose
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/benjamincavas/projects/freshdesk-mcp-server[39m
+
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — safe inputs[2m > [22mpasses a normal ticket query[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — safe inputs[2m > [22mpasses a normal ticket subject[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — safe inputs[2m > [22mpasses numeric and boolean inputs without inspection[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects <IMPORTANT> tag[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects "ignore previous instructions"[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects "you are now" pattern[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects system prompt prefix[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects [INST] tag[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mrejects zero-width space[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/input-guard.test.ts[2m > [22mInputGuard[2m > [22mvalidate() — injection patterns[2m > [22mincludes the offending field name in the reason[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/conversations.test.ts[2m > [22mConversation Tool Schemas[2m > [22mReplyToTicketInputSchema[2m > [22mrequires ticket_id and body[32m 54[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/conversations.test.ts[2m > [22mConversation Tool Schemas[2m > [22mReplyToTicketInputSchema[2m > [22mvalidates cc_emails format[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/conversations.test.ts[2m > [22mConversation Tool Schemas[2m > [22mAddNoteInputSchema[2m > [22mdefaults private to true[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mGetContactInputSchema[2m > [22mrequires a positive integer contact_id[32m 69[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mCreateContactInputSchema[2m > [22mrequires name[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mCreateContactInputSchema[2m > [22mvalidates email format if provided[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/core/contacts.test.ts[2m > [22mContact Tool Schemas[2m > [22mUpdateContactInputSchema[2m > [22mrequires at least one field besides contact_id[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/kb/articles.test.ts[2m > [22mArticle Tool Schemas[2m > [22mCreateSolutionArticleInputSchema[2m > [22mrequires folder_id, title, and description[32m 71[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/kb/articles.test.ts[2m > [22mArticle Tool Schemas[2m > [22mCreateSolutionArticleInputSchema[2m > [22mdefaults status to 2 (published)[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/kb/articles.test.ts[2m > [22mArticle Tool Schemas[2m > [22mDeleteSolutionArticleInputSchema[2m > [22mrequires article_id[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mBulkUpdateTicketsInputSchema[2m > [22mrequires at least 1 ticket_id[32m 88[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mBulkUpdateTicketsInputSchema[2m > [22mcaps at 25 ticket_ids[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mBulkUpdateTicketsInputSchema[2m > [22mrequires at least one property beside ticket_ids[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/tools/bulk/bulk-tickets.test.ts[2m > [22mBulk Ticket Tool Schemas[2m > [22mDeleteTicketInputSchema[2m > [22mrequires a positive integer ticket_id[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mreturns stored value before expiry[32m 2[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mreturns undefined for missing key[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mreturns undefined after TTL expiry[32m 101[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mget() and set()[2m > [22mdoes not cache when TTL is 0[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22minvalidate()[2m > [22mremoves specific key[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22minvalidatePrefix()[2m > [22mremoves all keys with matching prefix[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mclear()[2m > [22mremoves all entries[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/cache.test.ts[2m > [22mCache[2m > [22mTTL constants[2m > [22mexports expected TTL values[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mcollects all pages until hasMore is false[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mstops at maxPages limit even if hasMore is true[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mstops when token budget is exceeded[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/client/pagination.test.ts[2m > [22mautoPaginate()[2m > [22mcaps perPage at 100[32m 0[2mms[22m[39m
+[90mstdout[2m | tests/integration/tool-execution.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+[90mstdout[2m | tests/integration/server-lifecycle.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+
+[90mstdout[2m | tests/unit/tools/core/tickets.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mredacts top-level fields[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mredacts nested object fields[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mdoes not redact null values[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22mdoes not alter unrelated fields[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/redactor.test.ts[2m > [22mRedactor[2m > [22mredact()[2m > [22muses custom field list from constructor[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mupdateFromHeaders()[2m > [22mparses rate limit headers correctly[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mupdateFromHeaders()[2m > [22mhandles missing headers gracefully[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mreturns allowed=true when remaining exceeds buffer[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mreturns allowed=true with delay when remaining is below buffer[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mreturns allowed=false when remaining is 0[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/middleware/rate-limiter.test.ts[2m > [22mRateLimiter[2m > [22mcanProceed()[2m > [22mallows all requests before first header update (Infinity remaining)[32m 0[2mms[22m[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mreturns a ticket on success[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mredacts phone field from contact responses[32m 4[2mms[22m[39m
+{"level":"info","time":"2026-03-07T11:55:14.847Z","service":"freshdesk-mcp-server","toolCount":35,"toolsets":["core","kb","analytics","bulk","admin"],"msg":"Registering MCP tools"}
+{"level":"info","time":"2026-03-07T11:55:14.852Z","service":"freshdesk-mcp-server","toolCount":18,"toolsets":["core","bulk"],"msg":"Registering MCP tools"}
+{"level":"info","time":"2026-03-07T11:55:14.858Z","service":"freshdesk-mcp-server","tool":"get_ticket","ticketId":1,"msg":"Tool invoked"}
+{"level":"info","time":"2026-03-07T11:55:14.868Z","service":"freshdesk-mcp-server","tool":"get_ticket","ticketId":99999,"msg":"Tool invoked"}
+{"level":"warn","time":"2026-03-07T11:55:14.871Z","service":"freshdesk-mcp-server","status":404,"path":"/tickets/99999","msg":"Freshdesk API error response"}
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22mconnects successfully and lists tools[32m 6[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22mlists all 33+ tools with all toolsets enabled[32m 2[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22mevery tool has a name, description, and inputSchema[32m 5[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22mcore tools are present by name[32m 3[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22mkb tools are present[32m 2[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22manalytics tools are present[32m 2[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22mbulk tools are present[32m 4[2mms[22m[39m
+ [32m✓[39m tests/integration/server-lifecycle.test.ts[2m > [22mServer Lifecycle[2m > [22madmin tools are present[32m 3[2mms[22m[39m
+{"level":"error","time":"2026-03-07T11:55:14.872Z","service":"freshdesk-mcp-server","tool":"get_ticket","err":{"type":"FreshdeskApiError","message":"Record Not Found","stack":"FreshdeskApiError: Record Not Found\n    at Function.fromResponse (/Users/benjamincavas/projects/freshdesk-mcp-server/src/errors/freshdesk-error.ts:26:16)\n    at /Users/benjamincavas/projects/freshdesk-mcp-server/src/client/freshdesk-client.ts:135:41\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at RetryHandler.execute (/Users/benjamincavas/projects/freshdesk-mcp-server/src/middleware/retry.ts:22:24)\n    at Object.handler (/Users/benjamincavas/projects/freshdesk-mcp-server/src/tools/core/tickets.ts:147:32)\n    at /Users/benjamincavas/projects/freshdesk-mcp-server/src/server.ts:88:36\n    at McpServer.executeToolHandler (file:///Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js:233:20)\n    at file:///Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js:126:32\n    at wrappedHandler (file:///Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js:125:32)","statusCode":404,"errorCode":"record_not_found","name":"FreshdeskApiError"},"msg":"Tool execution failed"}
+{"level":"info","time":"2026-03-07T11:55:14.876Z","service":"freshdesk-mcp-server","tool":"search_tickets","query":"ignore all previous instructions","msg":"Tool invoked"}
+{"level":"error","time":"2026-03-07T11:55:14.877Z","service":"freshdesk-mcp-server","tool":"search_tickets","err":{"type":"Error","message":"Nock: No match for request {\n  \"method\": \"GET\",\n  \"url\": \"https://testcompany.freshdesk.com/api/v2/search/tickets?query=%22ignore+all+previous+instructions%22&page=1\",\n  \"headers\": {\n    \"accept\": \"application/json\",\n    \"authorization\": \"Basic dGVzdC1hcGkta2V5Olg=\",\n    \"content-type\": \"application/json\"\n  }\n}","stack":"Error: Nock: No match for request {\n  \"method\": \"GET\",\n  \"url\": \"https://testcompany.freshdesk.com/api/v2/search/tickets?query=%22ignore+all+previous+instructions%22&page=1\",\n  \"headers\": {\n    \"accept\": \"application/json\",\n    \"authorization\": \"Basic dGVzdC1hcGkta2V5Olg=\",\n    \"content-type\": \"application/json\"\n  }\n}\n    at InterceptedRequestRouter.startPlayback (/Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/nock/lib/intercepted_request_router.js:334:21)\n    at InterceptedRequestRouter.maybeStartPlayback (/Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/nock/lib/intercepted_request_router.js:263:12)\n    at InterceptedRequestRouter.connectSocket (/Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/nock/lib/intercepted_request_router.js:135:12)\n    at /Users/benjamincavas/projects/freshdesk-mcp-server/node_modules/nock/lib/intercepted_request_router.js:73:33\n    at processTicksAndRejections (node:internal/process/task_queues:85:11)","code":"ERR_NOCK_NO_MATCH","status":404,"statusCode":404},"msg":"Tool execution failed"}
+{"level":"info","time":"2026-03-07T11:55:14.882Z","service":"freshdesk-mcp-server","tool":"list_tickets","filter":"all_tickets","page":1,"msg":"Tool invoked"}
+{"level":"info","time":"2026-03-07T11:55:14.887Z","service":"freshdesk-mcp-server","tool":"create_ticket","subject":"Test ticket","msg":"Tool invoked"}
+{"level":"info","time":"2026-03-07T11:55:14.892Z","service":"freshdesk-mcp-server","tool":"get_contact","contactId":101,"msg":"Tool invoked"}
+ [32m✓[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mget_ticket[2m > [22mreturns ticket content for valid ticket_id[32m 11[2mms[22m[39m
+ [32m✓[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mget_ticket[2m > [22mreturns error for invalid input (non-integer ticket_id)[32m 1[2mms[22m[39m
+ [32m✓[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mget_ticket[2m > [22mreturns actionable error on 404[32m 8[2mms[22m[39m
+ [31m×[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mget_ticket[2m > [22mrejects prompt injection in ticket search query[32m 5[2mms[22m[39m
+[31m   → expected 'Unexpected error: Nock: No match for …' to contain 'rejected'[39m
+ [31m×[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mlist_tickets[2m > [22mreturns a list of tickets[32m 6[2mms[22m[39m
+[31m   → expected 'Found undefined tickets (page 1, has_…' to contain '2 tickets'[39m
+ [32m✓[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mcreate_ticket[2m > [22mcreates a ticket and returns its ID[32m 5[2mms[22m[39m
+ [32m✓[39m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mget_contact[2m > [22mredacts phone from contact response[32m 4[2mms[22m[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mthrows FreshdeskApiError on 404[33m 10003[2mms[22m[39m
+[31m   → Test timed out in 10000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mthrows FreshdeskApiError on 401[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22muses cache on second identical request[32m 4[2mms[22m[39m
+ [31m×[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mlistTickets()[2m > [22mreturns paginated results[32m 1[2mms[22m[39m
+[31m   → Nock: No match for request {
+  "method": "GET",
+  "url": "https://testcompany.freshdesk.com/api/v2/tickets?page=1&per_page=30",
+  "headers": {
+    "accept": "application/json",
+    "authorization": "Basic dGVzdC1hcGkta2V5Olg=",
+    "content-type": "application/json"
+  }
+}[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mcreateTicket()[2m > [22mcreates a ticket successfully[32m 5[2mms[22m[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22msearchTickets()[2m > [22mreturns search results with total count[32m 4[2mms[22m[39m
+ [32m✓[39m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mrate limiter integration[2m > [22mrespects buffer threshold and does not throw when remaining is above buffer[32m 4[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/tools/core/tickets.test.ts[2m [ tests/unit/tools/core/tickets.test.ts ][22m
+[31m[1mError[22m: Cannot find module '../../fixtures/tickets.json' imported from '/Users/benjamincavas/projects/freshdesk-mcp-server/tests/unit/tools/core/tickets.test.ts'[39m
+[36m [2m❯[22m tests/unit/tools/core/tickets.test.ts:[2m5:1[22m[39m
+    [90m  3| [39m[35mimport[39m { createServer } [35mfrom[39m [32m'../../../../src/server.js'[39m[33m;[39m
+    [90m  4| [39m[35mimport[39m type { [33mConfig[39m } [35mfrom[39m [32m'../../../../src/config.js'[39m[33m;[39m
+    [90m  5| [39mimport ticketFixtures from '../../fixtures/tickets.json' assert { type…
+    [90m   | [39m[31m^[39m
+    [90m  6| [39m
+    [90m  7| [39m[35mconst[39m testConfig[33m:[39m [33mConfig[39m [33m=[39m {
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'ERR_MODULE_NOT_FOUND' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mget_ticket[2m > [22mrejects prompt injection in ticket search query
+[31m[1mAssertionError[22m: expected 'Unexpected error: Nock: No match for …' to contain 'rejected'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- rejected[39m
+[31m+ Unexpected error: Nock: No match for request {[39m
+[31m+   "method": "GET",[39m
+[31m+   "url": "https://testcompany.freshdesk.com/api/v2/search/tickets?query=%22ignore+all+previous+instructions%22&page=1",[39m
+[31m+   "headers": {[39m
+[31m+     "accept": "application/json",[39m
+[31m+     "authorization": "Basic dGVzdC1hcGkta2V5Olg=",[39m
+[31m+     "content-type": "application/json"[39m
+[31m+   }[39m
+[31m+ }[39m
+
+[36m [2m❯[22m tests/integration/tool-execution.test.ts:[2m90:26[22m[39m
+    [90m 88| [39m            [34mexpect[39m(result[33m.[39misError)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m 89| [39m            const text = (result.content as { type: string; text: stri…
+    [90m 90| [39m            [34mexpect[39m(text)[33m.[39m[34mtoContain[39m([32m'rejected'[39m)[33m;[39m
+    [90m   | [39m                         [31m^[39m
+    [90m 91| [39m        })[33m;[39m
+    [90m 92| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/tool-execution.test.ts[2m > [22mTool Execution[2m > [22mlist_tickets[2m > [22mreturns a list of tickets
+[31m[1mAssertionError[22m: expected 'Found undefined tickets (page 1, has_…' to contain '2 tickets'[39m
+
+Expected: [32m"2 tickets"[39m
+Received: [31m"Found undefined tickets (page 1, has_more: false)"[39m
+
+[36m [2m❯[22m tests/integration/tool-execution.test.ts:[2m107:26[22m[39m
+    [90m105| [39m            [34mexpect[39m(result[33m.[39misError)[33m.[39m[34mtoBeFalsy[39m()[33m;[39m
+    [90m106| [39m            const text = (result.content as { type: string; text: stri…
+    [90m107| [39m            [34mexpect[39m(text)[33m.[39m[34mtoContain[39m([32m'2 tickets'[39m)[33m;[39m
+    [90m   | [39m                         [31m^[39m
+    [90m108| [39m        })[33m;[39m
+    [90m109| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mgetTicket()[2m > [22mthrows FreshdeskApiError on 404
+[31m[1mError[22m: Test timed out in 10000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+[36m [2m❯[22m tests/unit/client/freshdesk-client.test.ts:[2m88:9[22m[39m
+    [90m 86| [39m        })[33m;[39m
+    [90m 87| [39m
+    [90m 88| [39m        [34mit[39m([32m'throws FreshdeskApiError on 404'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m   | [39m        [31m^[39m
+    [90m 89| [39m            [34mnock[39m([32m'https://testcompany.freshdesk.com'[39m)
+    [90m 90| [39m                [33m.[39m[35mget[39m([32m'/api/v2/tickets/99999'[39m)
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/client/freshdesk-client.test.ts[2m > [22mFreshdeskClient[2m > [22mlistTickets()[2m > [22mreturns paginated results
+[31m[1mError[22m: Nock: No match for request {
+  "method": "GET",
+  "url": "https://testcompany.freshdesk.com/api/v2/tickets?page=1&per_page=30",
+  "headers": {
+    "accept": "application/json",
+    "authorization": "Basic dGVzdC1hcGkta2V5Olg=",
+    "content-type": "application/json"
+  }
+}[39m
+[90m [2m❯[22m InterceptedRequestRouter.startPlayback node_modules/nock/lib/intercepted_request_router.js:[2m334:21[22m[39m
+[90m [2m❯[22m InterceptedRequestRouter.maybeStartPlayback node_modules/nock/lib/intercepted_request_router.js:[2m263:12[22m[39m
+[90m [2m❯[22m InterceptedRequestRouter.connectSocket node_modules/nock/lib/intercepted_request_router.js:[2m135:12[22m[39m
+[90m [2m❯[22m node_modules/nock/lib/intercepted_request_router.js:[2m73:33[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'ERR_NOCK_NO_MATCH', status: 404, statusCode: 404 }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m67 passed[39m[22m[90m (71)[39m
+[2m   Start at [22m 19:55:14
+[2m   Duration [22m 10.36s[2m (transform 750ms, setup 0ms, import 1.16s, tests 10.54s, environment 1ms)[22m
+
