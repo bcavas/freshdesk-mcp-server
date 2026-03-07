@@ -1,0 +1,57 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: freshdesk-mcp-server
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # Scale to zero when idle; start on first request
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "3"
+        # Session affinity: route requests from same client to same instance
+        # Required for stateful MCP sessions; harmless for stateless mode
+        run.googleapis.com/sessionAffinity: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 3600
+      serviceAccountName: freshdesk-mcp-sa@PROJECT_ID.iam.gserviceaccount.com
+      containers:
+        - image: IMAGE_URL_PLACEHOLDER
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MCP_TRANSPORT
+              value: "streamable-http"
+            - name: MCP_ENABLED_TOOLSETS
+              value: "core"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: FRESHDESK_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: freshdesk-domain
+                  key: latest
+            - name: FRESHDESK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: freshdesk-api-key
+                  key: latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30

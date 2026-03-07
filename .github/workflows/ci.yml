@@ -12,3 +12,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:coverage
       - run: npm run build
+      - name: Validate Docker build
+        run: |
+          docker build --target builder -t freshdesk-mcp-server:ci-test . \
+            && echo "Docker build succeeded" \
+            || (echo "Docker build FAILED" && exit 1)

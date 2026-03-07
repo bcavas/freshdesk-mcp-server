@@ -16,7 +16,13 @@ const httpServer = createHttpServer(async (req, res) => {
     // Health check endpoint
     if (url.pathname === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'ok', version: '0.1.0', transport: 'streamable-http' }));
+        res.end(
+            JSON.stringify({
+                status: 'ok',
+                version: process.env.npm_package_version ?? 'unknown',
+                transport: 'streamable-http',
+            }),
+        );
         return;
     }
 
@@ -90,9 +96,10 @@ const httpServer = createHttpServer(async (req, res) => {
     res.end('Not found');
 });
 
-httpServer.listen(config.server.port, config.server.host, () => {
+const port = parseInt(process.env.PORT ?? String(config.server.port), 10);
+httpServer.listen(port, config.server.host, () => {
     logger.info(
-        { port: config.server.port, host: config.server.host, transport: 'streamable-http' },
+        { port, host: config.server.host, transport: 'streamable-http' },
         'Freshdesk MCP server listening',
     );
 });

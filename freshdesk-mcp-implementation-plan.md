@@ -1679,15 +1679,74 @@ Execute in this exact order:
 ### Phase 4: Deployment and Distribution (Days 17–22)
 
 | Day | Task | Deliverable | Verification |
-|-----|------|-------------|-------------|
-| 17 | [DONE] Azure Functions setup: Bicep template, deploy first version | Live `/mcp` endpoint on Azure | `curl https://your-app.azurewebsites.net/health` returns 200 |
-| 18 | [DONE] Azure Key Vault integration, managed identity | Secrets not in env vars | App settings reference Key Vault, API calls succeed |
-| 18 | [DONE] GitHub Actions CI/CD | Automated test + deploy pipeline | Push to main triggers deploy, PR triggers CI |
-| 19 | [DONE] npm publish preparation: README, TOOLS.md, CONFIGURATION.md | Publish-ready package | `npm pack` produces clean tarball |
-| 19 | Publish to npm registry | `freshdesk-mcp-server` on npm | `npx freshdesk-mcp-server` runs successfully |
-| 20 | Register on Official MCP Registry, Smithery, PulseMCP, mcp.so | Listed on 4+ registries | Searchable on each platform |
+|-----|------|-------------|--------------|
+| 17 | Run `infra/cloud-run/setup.sh`; add GitHub secrets; push to main to trigger first deploy | Live Cloud Run service | `curl https://SERVICE_URL/health` returns HTTP 200 |
+| 18 | Confirm Secret Manager integration; verify secrets resolve in Cloud Run logs | No plaintext credentials in env | Cloud Run logs show tool calls succeeding; secret references show ✓ in Console |
+| 18 | Validate GitHub Actions CI/CD pipeline end-to-end | Automated build + deploy | PR triggers CI with Docker build step; merge to main triggers full deploy |
+| 19 | npm publish preparation: README, TOOLS.md, CONFIGURATION.md | Publish-ready package | `npm pack --dry-run` lists only: `dist/`, `README.md`, `LICENSE`, `server.json` |
+| 19 | Publish to npm registry | `freshdesk-mcp-server` on npm | `npx freshdesk-mcp-server` runs stdio transport successfully |
+| 20 | Update `server.json` with live Cloud Run URL; register on Official MCP Registry, Smithery, PulseMCP, mcp.so | Listed on 4+ registries | Searchable on each platform with correct `/mcp` endpoint URL |
 | 21 | MCPize integration (if monetizing) | Credit-based gating operational | Free tier: 100 calls; Pro tier: unlimited |
-| 22 | End-to-end validation with Claude Desktop | Full workflow test | Invoke 5+ tools in a real conversation |
+| 22 | End-to-end validation with Claude Desktop | Full workflow test | Invoke 5+ tools in a real conversation against live Cloud Run endpoint |
+
+#### Day 17 — Detailed Execution
+
+**Prerequisite:** `gcloud` CLI installed and authenticated. Active Google Cloud project with billing enabled.
+
+```bash
+# Set your project
+gcloud config set project YOUR_PROJECT_ID
+
+# Run setup (one-time)
+GITHUB_REPO="YOUR_ORG/freshdesk-mcp-server" bash infra/cloud-run/setup.sh
+```
+
+The script outputs four values. Add them as **GitHub Actions secrets** (Settings → Secrets and variables → Actions → New repository secret):
+
+| Secret name | Value source |
+|---|---|
+| `GCP_PROJECT_ID` | Your Google Cloud project ID |
+| `GCP_REGION` | Region chosen during setup (e.g. `us-central1`) |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Output by setup.sh |
+| `GCP_SERVICE_ACCOUNT` | Output by setup.sh |
+
+Trigger the first deployment by pushing to `main`:
+```bash
+git add .
+git commit -m "chore: migrate deployment target from Azure Functions to Cloud Run"
+git push origin main
+```
+
+Watch the Actions tab. The deploy job will build the Docker image, push to Artifact Registry, and deploy to Cloud Run. The final step outputs the service URL and verifies the `/health` endpoint.
+
+**Expected first-deployment service URL format:**
+`https://freshdesk-mcp-server-[hash]-[region-code].a.run.app`
+
+#### Day 18 — Secret Manager Verification
+
+Confirm secrets resolve correctly without any plaintext values appearing in logs:
+
+```bash
+# Check that secret references show as resolved (green checkmark) in Cloud Run console
+gcloud run services describe freshdesk-mcp-server \
+  --region=YOUR_REGION \
+  --format="yaml(spec.template.spec.containers[0].env)"
+```
+
+The output should show `secretKeyRef` entries for `FRESHDESK_DOMAIN` and `FRESHDESK_API_KEY`, not plaintext values.
+
+Trigger a test tool call to confirm end-to-end secrets resolution works:
+```bash
+curl -X POST https://SERVICE_URL/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/list","params":{},"id":1}'
+```
+
+Expected response: a JSON-RPC result containing the tools array with 15+ tools.
+
+#### Days 19–22
+
+These steps are identical to the original plan. The npm publish, registry listings, MCPize integration, and Claude Desktop end-to-end validation steps are platform-agnostic and require no changes. The only Day 20 difference: after registering on registries, update `server.json` with the real Cloud Run URL obtained from Day 17, commit, and push.
 
 ---
 

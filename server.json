@@ -5,7 +5,7 @@
     "homepage": "https://github.com/YOUR_USERNAME/freshdesk-mcp-server",
     "transport": {
         "streamableHttp": {
-            "url": "https://your-deployment-url.azurewebsites.net/mcp"
+            "url": "https://freshdesk-mcp-server-REPLACE_WITH_HASH-REPLACE_WITH_REGION.a.run.app/mcp"
         },
         "stdio": {
             "command": "npx",

@@ -21,7 +21,10 @@
     "lint:fix": "eslint src/ --ext .ts --fix",
     "format": "prettier --write 'src/**/*.ts'",
     "typecheck": "tsc --noEmit",
-    "inspect": "npx @modelcontextprotocol/inspector dist/index.js",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "docker:build": "docker build -t freshdesk-mcp-server .",
+    "docker:run": "docker run --rm -p 8080:8080 --env-file .env freshdesk-mcp-server",
+    "docker:test": "npm run docker:build && npm run docker:run",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

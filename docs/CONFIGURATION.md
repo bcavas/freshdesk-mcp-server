@@ -18,6 +18,7 @@ All environment variables supported by the Freshdesk MCP Server.
 | Variable | Default | Description |
 |---|---|---|
 | `MCP_TRANSPORT` | `streamable-http` | Transport mode: `streamable-http` or `stdio` |
+| `PORT` | `3000` | HTTP port the server binds to. Cloud Run injects this automatically at runtime; do not set manually in production. Overrides `MCP_PORT` when present. |
 | `MCP_PORT` | `3000` | HTTP server port (only used with `streamable-http`) |
 | `MCP_HOST` | `0.0.0.0` | HTTP server bind address |
 

@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/freshdesk-mcp-server.svg)](https://www.npmjs.com/package/freshdesk-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![MCP Protocol](https://img.shields.io/badge/MCP-2025--11--25-purple)](https://modelcontextprotocol.io)
+[![Deploy to Cloud Run](https://img.shields.io/badge/Deploy-Cloud%20Run-4285F4?logo=googlecloud)](https://console.cloud.google.com/run)
 
 Enterprise-grade **MCP (Model Context Protocol) server** for [Freshdesk](https://freshdesk.com). Gives AI agents (Claude, GPT-4, Gemini, etc.) full agentic access to your Freshdesk helpdesk — read and write tickets, contacts, knowledge base articles, and more.
 
@@ -38,7 +38,7 @@ Add to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "freshdesk": {
-      "url": "https://your-deployment.azurewebsites.net/mcp"
+      "url": "https://freshdesk-mcp-server-REPLACE_WITH_HASH-REPLACE_WITH_REGION.a.run.app/mcp"
     }
   }
 }
@@ -130,12 +130,16 @@ MCP_ENABLED_TOOLSETS=core,kb,analytics,bulk,admin
 
 ---
 
-## Azure Deployment
+## Cloud Run Deployment
 
-One-command deploy to Azure Functions (Flex Consumption, ~$2–12/month):
+Deploy to Google Cloud Run using the one-time setup script and GitHub Actions CI/CD:
 
 ```bash
-azd up
+# One-time setup — provisions all required Google Cloud resources
+GITHUB_REPO="YOUR_ORG/freshdesk-mcp-server" bash infra/cloud-run/setup.sh
+
+# Add the four output values as GitHub Actions secrets, then push to main:
+git push origin main
 ```
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full guide.
@@ -146,7 +150,7 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for full guide.
 
 - **PII Redaction**: `phone`, `mobile`, and `twitter_id` fields are redacted from all API responses before they reach the LLM. Configurable via `REDACT_FIELDS`.
 - **Prompt Injection Detection**: All tool inputs are scanned for injection patterns (`<IMPORTANT>`, `ignore previous instructions`, zero-width spaces, etc.).
-- **Authentication**: Uses Freshdesk API key via HTTP Basic Auth. Keep your API key in a secret manager (Key Vault on Azure, not in `env` in production).
+- **Authentication**: Uses Freshdesk API key via HTTP Basic Auth. Keep your API key in a secret manager (Google Cloud Secret Manager, not in `env` in production).
 - **Rate Limiting**: Proactive rate limit tracking using `X-RateLimit-Remaining` headers with a configurable buffer threshold.
 
 ---
@@ -189,7 +193,7 @@ npm run inspect
 | Injection Protection | ✅ | ❌ | ❌ |
 | Rate Limiting | ✅ | Partial | ❌ |
 | Caching | ✅ | ❌ | ❌ |
-| Azure Deployment | ✅ (IaC) | ❌ | ❌ |
+| Cloud Run Deployment | ✅ (IaC) | ❌ | ❌ |
 | TypeScript | ✅ | ✅ | ❌ |
 | Test Coverage | ✅ 80%+ | ❌ | ❌ |
 

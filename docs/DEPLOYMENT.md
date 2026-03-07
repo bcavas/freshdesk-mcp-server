@@ -1,113 +1,147 @@
-# Azure Deployment Guide
+# Deployment Guide — Google Cloud Run
+
+`freshdesk-mcp-server` runs on Google Cloud Run as a containerized Node.js 20 service. This guide covers initial setup, CI/CD configuration, and post-deployment management.
 
 ## Prerequisites
 
-- Azure CLI (`az --version` ≥ 2.50)
-- An Azure subscription
-- Node.js 20+
+| Requirement | Version / Notes |
+|---|---|
+| Docker | 24+ (for local testing) |
+| Google Cloud SDK | Latest — install at https://cloud.google.com/sdk/docs/install |
+| Node.js | 20.x LTS |
+| GitHub repository | With Actions enabled |
 
----
+## Architecture
 
-## Option 1: Azure Developer CLI (Recommended)
-
-```bash
-# Install azd
-npm install -g @azure/dev
-# or: brew install azure/azd/azd (macOS)
-
-# Login
-az login
-azd auth login
-
-# Deploy (provisions and deploys in one step)
-azd up
+```
+GitHub push to main
+  → GitHub Actions (build + test + docker push)
+  → Artifact Registry (container image storage)
+  → Cloud Run (serverless container execution)
+  → Secret Manager (FRESHDESK_DOMAIN + FRESHDESK_API_KEY)
 ```
 
-You'll be prompted for:
-- **Environment name** (e.g., `freshdesk-mcp-prod`)
-- **Azure subscription**
-- **Region** (recommend `eastus` or `westus2`)
-- `FRESHDESK_DOMAIN` and `FRESHDESK_API_KEY` (stored in Key Vault)
+The service scales to zero when idle (no traffic = $0 compute cost) and scales up automatically on incoming MCP requests. Requests from the same MCP client are routed to the same instance via session affinity, preserving any in-memory MCP session state.
 
----
-
-## Option 2: Manual Bicep Deployment
+## Initial Setup (One Time)
 
 ```bash
-# Create resource group
-az group create --name freshdesk-mcp-rg --location eastus
+# Authenticate with Google Cloud
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
 
-# Deploy Bicep template
-az deployment group create \
-  --resource-group freshdesk-mcp-rg \
-  --template-file infra/main.bicep \
-  --parameters appName=freshdesk-mcp-server location=eastus
-
-# Build and deploy function app
-npm ci && npm run build
-az functionapp deployment source config-zip \
-  --resource-group freshdesk-mcp-rg \
-  --name freshdesk-mcp-server \
-  --src dist.zip
+# Run the setup script — provisions all required cloud resources
+GITHUB_REPO="YOUR_ORG/freshdesk-mcp-server" bash infra/cloud-run/setup.sh
 ```
 
----
+The setup script creates:
+- Artifact Registry repository for Docker images
+- Two Secret Manager secrets (`freshdesk-domain`, `freshdesk-api-key`)
+- A dedicated service account with least-privilege access
+- Workload Identity Federation pool for keyless GitHub Actions authentication
 
-## Setting Secrets in Key Vault
+After running, copy the four output values into GitHub Actions secrets (Settings → Secrets and variables → Actions):
+- `GCP_PROJECT_ID`
+- `GCP_REGION`
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`
+- `GCP_SERVICE_ACCOUNT`
+
+## Updating Secrets
+
+To rotate the Freshdesk API key:
 
 ```bash
-# After deployment, add your Freshdesk API key
-az keyvault secret set \
-  --vault-name freshdesk-mcp-server-kv \
-  --name freshdesk-api-key \
-  --value "YOUR_API_KEY"
-
-# Set the domain in app settings
-az functionapp config appsettings set \
-  --resource-group freshdesk-mcp-rg \
-  --name freshdesk-mcp-server \
-  --settings FRESHDESK_DOMAIN=yourcompany
+echo -n "NEW_API_KEY" | gcloud secrets versions add freshdesk-api-key \
+  --data-file=- \
+  --project=YOUR_PROJECT_ID
 ```
 
----
-
-## Verifying the Deployment
+Cloud Run automatically resolves to the `latest` version on the next container start. To force an immediate rotation, redeploy:
 
 ```bash
-# Health check
-curl https://freshdesk-mcp-server.azurewebsites.net/health
-# Expected: {"status":"ok","version":"0.1.0"}
+gcloud run services update freshdesk-mcp-server \
+  --region=YOUR_REGION \
+  --project=YOUR_PROJECT_ID \
+  --no-traffic  # updates config without shifting traffic
+gcloud run services update-traffic freshdesk-mcp-server \
+  --to-latest \
+  --region=YOUR_REGION \
+  --project=YOUR_PROJECT_ID
+```
 
-# Test MCP endpoint (initialize session)
-curl -X POST https://freshdesk-mcp-server.azurewebsites.net/mcp \
+## CI/CD Pipeline
+
+Every push to `main` triggers `.github/workflows/deploy.yml`:
+
+1. Full CI checks (lint, typecheck, test coverage, build)
+2. Docker image built and pushed to Artifact Registry with SHA tag + `latest`
+3. `infra/cloud-run/service.yaml` patched with the SHA-tagged image URL
+4. `gcloud run services replace` deploys the new revision
+5. Health endpoint polled until HTTP 200 or timeout (60s)
+
+Every pull request triggers `.github/workflows/ci.yml`:
+- Lint, typecheck, test coverage, build
+- Docker build validation (builder stage only, no push)
+
+## Local Testing with Docker
+
+```bash
+# Build the image
+npm run docker:build
+
+# Create a local .env file with real credentials (never commit this)
+cp .env.example .env
+# Edit .env: set FRESHDESK_DOMAIN and FRESHDESK_API_KEY
+
+# Run locally
+npm run docker:run
+# Server available at http://localhost:8080
+
+# Test health
+curl http://localhost:8080/health
+
+# Test MCP tools/list
+curl -X POST http://localhost:8080/mcp \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","clientInfo":{"name":"test","version":"1.0"}}}'
+  -d '{"jsonrpc":"2.0","method":"tools/list","params":{},"id":1}'
 ```
-
----
-
-## MCP Client Configuration (Remote Mode)
-
-For Claude Desktop or other MCP clients that support remote servers:
-
-```json
-{
-  "mcpServers": {
-    "freshdesk": {
-      "url": "https://freshdesk-mcp-server.azurewebsites.net/mcp"
-    }
-  }
-}
-```
-
----
 
 ## Cost Estimate
 
-| Resource | SKU | Est. Monthly Cost |
+| Scenario | Estimated Monthly Cost |
+|---|---|
+| Scale to zero, under 2M requests | **$0** (free tier) |
+| Moderate traffic, 256MB, 1 vCPU | ~$0.50–$2.00 |
+| Always-on (min 1 instance) | ~$5–$10 |
+
+The free tier covers 2 million requests/month and 180,000 vCPU-seconds/month. A typical MCP tool call takes less than 1 second of vCPU time, meaning the free tier supports approximately 180,000 tool calls per month at zero cost.
+
+## Monitoring and Logs
+
+```bash
+# Tail live logs
+gcloud run services logs tail freshdesk-mcp-server \
+  --region=YOUR_REGION \
+  --project=YOUR_PROJECT_ID
+
+# View last 100 log entries
+gcloud run services logs read freshdesk-mcp-server \
+  --limit=100 \
+  --region=YOUR_REGION \
+  --project=YOUR_PROJECT_ID
+```
+
+Structured JSON logs from Pino are parsed automatically by Cloud Logging. Filter by severity or field in the Cloud Console at: https://console.cloud.google.com/logs.
+
+## Service Configuration Reference
+
+`infra/cloud-run/service.yaml` is the declarative source of truth for the Cloud Run service configuration. Key settings:
+
+| Setting | Value | Purpose |
 |---|---|---|
-| Functions (Flex Consumption) | FC1 | ~$1–8 (scale-to-zero) |
-| Storage Account | Standard LRS | ~$0.05 |
-| Application Insights | Pay-as-you-go | ~$0–3 |
-| Key Vault | Standard | ~$0.03 |
-| **Total** | | **~$2–12/month** |
+| `minScale` | 0 | Scale to zero when idle |
+| `maxScale` | 3 | Cap concurrent instances |
+| `sessionAffinity` | true | Route MCP sessions to same instance |
+| `timeoutSeconds` | 3600 | Allow long-running streaming connections |
+| `containerConcurrency` | 80 | Requests per instance before scaling |
+| Secrets | Secret Manager refs | No plaintext credentials in config |

@@ -9,6 +9,7 @@ export const ConfigSchema = z.object({
     }),
     server: z.object({
         transport: z.enum(['stdio', 'streamable-http']).default('streamable-http'),
+        /** Default port for local development. At runtime on Cloud Run, process.env.PORT overrides this via src/index.ts. */
         port: z.number().int().min(1).max(65535).default(3000),
         host: z.string().default('0.0.0.0'),
     }),
