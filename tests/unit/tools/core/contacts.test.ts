@@ -148,9 +148,9 @@ describe('Tool Tests: contacts.ts', () => {
                 searchContacts: vi.fn().mockResolvedValue({ results: [fullContact, minContact], total: 2 }),
                 updateContact: vi.fn().mockResolvedValue(minContact),
                 createContact: vi.fn().mockResolvedValue(fullContact),
-            } as unknown as FreshdeskClient;
+            };
 
-            const tools = registerContactTools(mockClient, mockLogger);
+            const tools = registerContactTools(mockClient as unknown as FreshdeskClient, mockLogger);
 
             for (const tool of tools) {
                 if (tool.name === 'get_contact') await (tool as any).handler({ contact_id: 1 });

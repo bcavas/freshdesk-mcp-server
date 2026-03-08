@@ -41,8 +41,8 @@ describe('Tool Tests: ticket-fields.ts', () => {
                     { id: 1, label: 'L', name: 'N', type: 'default_status', choices: { a: 1 }, default: true, required_for_agents: true },
                     { id: 2, label: 'M', name: 'O', type: 'custom_text', default: false, required_for_agents: false }
                 ]),
-            } as unknown as FreshdeskClient;
-            const tools = registerTicketFieldTools(mockClient, mockLogger);
+            };
+            const tools = registerTicketFieldTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'list_ticket_fields') await (tool as any).handler({});
             }

@@ -174,9 +174,9 @@ describe('Tool Tests: tickets.ts', () => {
                 searchTickets: vi.fn().mockResolvedValue({ results: [fullTicket, minTicket], total: 2 }),
                 updateTicket: vi.fn().mockResolvedValue(minTicket),
                 createTicket: vi.fn().mockResolvedValue(minTicket),
-            } as unknown as FreshdeskClient;
+            };
 
-            const tools = registerTicketTools(mockClient, mockLogger);
+            const tools = registerTicketTools(mockClient as unknown as FreshdeskClient, mockLogger);
 
             for (const tool of tools) {
                 if (tool.name === 'get_ticket') await (tool as any).handler({ ticket_id: 1 });

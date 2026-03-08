@@ -40,9 +40,9 @@ describe('Tool Tests: bulk-contacts.ts', () => {
                 // mergeContacts is presumably implemented or uses updateContact?
                 updateContact: vi.fn().mockResolvedValue({ id: 1 }),
                 deleteContact: vi.fn().mockResolvedValue(undefined),
-            } as any;
+            } as unknown as FreshdeskClient;
             // Let's just mock what the handler does
-            mockClient.client = { put: vi.fn().mockResolvedValue({}) };
+            (mockClient as any).client = { put: vi.fn().mockResolvedValue({}) };
             const tools = registerBulkContactTools(mockClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'merge_contacts') {

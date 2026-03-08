@@ -68,8 +68,8 @@ describe('Tool Tests: time-entries.ts', () => {
                     { id: 2, time_spent: '02' }
                 ]),
                 createTimeEntry: vi.fn().mockResolvedValue({ id: 1 }),
-            } as unknown as FreshdeskClient;
-            const tools = registerTimeEntryTools(mockClient, mockLogger);
+            };
+            const tools = registerTimeEntryTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'list_time_entries') await (tool as any).handler({ ticket_id: 1 });
                 if (tool.name === 'create_time_entry') {

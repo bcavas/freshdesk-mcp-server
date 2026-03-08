@@ -41,8 +41,8 @@ describe('Tool Tests: automations.ts', () => {
                     { id: 1, name: 'A', active: true, position: 1 },
                     { id: 2, name: 'B', active: false, position: 2 }
                 ]),
-            } as unknown as FreshdeskClient;
-            const tools = registerAutomationTools(mockClient, mockLogger);
+            };
+            const tools = registerAutomationTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'list_automation_rules') await (tool as any).handler({ type: 'ticket_creation' });
             }

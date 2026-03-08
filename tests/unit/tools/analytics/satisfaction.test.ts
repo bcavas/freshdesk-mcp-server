@@ -71,8 +71,8 @@ describe('Tool Tests: satisfaction.ts', () => {
                     ],
                     page: 1
                 }),
-            } as unknown as FreshdeskClient;
-            const tools = registerSatisfactionTools(mockClient, mockLogger);
+            };
+            const tools = registerSatisfactionTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'list_satisfaction_ratings') await (tool as any).handler({ created_since: '2023-01-01T00:00:00Z' });
                 if (tool.name === 'get_ticket_satisfaction') {

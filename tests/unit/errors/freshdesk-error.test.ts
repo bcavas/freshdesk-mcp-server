@@ -25,7 +25,7 @@ describe('FreshdeskApiError', () => {
     });
 
     it('falls back to default message and empty body', () => {
-        const error = FreshdeskApiError.fromResponse(500, null as any, {});
+        const error = FreshdeskApiError.fromResponse(500, null as unknown as Record<string, unknown>, {});
         expect(error.message).toBe('Freshdesk API error: HTTP 500');
         expect(error.errorCode).toBe('HTTP_500');
         expect(error.retryAfter).toBeUndefined();

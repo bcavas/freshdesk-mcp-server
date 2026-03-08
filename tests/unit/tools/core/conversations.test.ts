@@ -92,9 +92,9 @@ describe('Tool Tests: conversations.ts', () => {
                 listConversations: vi.fn().mockResolvedValue([{ id: 1 }]),
                 replyToTicket: vi.fn().mockResolvedValue({ id: 1 }),
                 addNote: vi.fn().mockResolvedValue({ id: 1 }),
-            } as unknown as FreshdeskClient;
+            };
 
-            const tools = registerConversationTools(mockClient, mockLogger);
+            const tools = registerConversationTools(mockClient as unknown as FreshdeskClient, mockLogger);
 
             for (const tool of tools) {
                 if (tool.name === 'list_conversations') await (tool as any).handler({ ticket_id: 1 });

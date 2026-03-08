@@ -69,9 +69,9 @@ describe('Tool Tests: agents.ts', () => {
                     .mockResolvedValueOnce(fullAgent)
                     .mockResolvedValueOnce(minAgent),
                 listAgents: vi.fn().mockResolvedValue({ data: [fullAgent, minAgent], page: 1 }),
-            } as unknown as FreshdeskClient;
+            };
 
-            const tools = registerAgentTools(mockClient, mockLogger);
+            const tools = registerAgentTools(mockClient as unknown as FreshdeskClient, mockLogger);
 
             for (const tool of tools) {
                 if (tool.name === 'get_agent') {
@@ -81,8 +81,8 @@ describe('Tool Tests: agents.ts', () => {
                 if (tool.name === 'list_agents') await (tool as any).handler({ page: 1 });
             }
 
-            expect(mockClient.getAgent).toHaveBeenCalledTimes(2);
-            expect(mockClient.listAgents).toHaveBeenCalled();
+            expect(vi.mocked(mockClient.getAgent)).toHaveBeenCalledTimes(2);
+            expect(vi.mocked(mockClient.listAgents)).toHaveBeenCalled();
         });
     });
 });

@@ -65,8 +65,8 @@ describe('Tool Tests: bulk-tickets.ts', () => {
             const mockClient = {
                 bulkUpdateTickets: vi.fn().mockResolvedValue({ job_id: '123' }),
                 deleteTicket: vi.fn().mockResolvedValue(undefined),
-            } as unknown as FreshdeskClient;
-            const tools = registerBulkTicketTools(mockClient, mockLogger);
+            };
+            const tools = registerBulkTicketTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'bulk_update_tickets') await (tool as any).handler({ ticket_ids: [1, 2], status: 4 });
                 if (tool.name === 'delete_ticket') await (tool as any).handler({ ticket_id: 1 });

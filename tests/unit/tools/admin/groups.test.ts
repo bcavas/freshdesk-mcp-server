@@ -38,8 +38,8 @@ describe('Tool Tests: groups.ts', () => {
         it('executes tools with mock client', async () => {
             const mockClient = {
                 listGroups: vi.fn().mockResolvedValue([{ id: 1, name: 'Group 1', agent_ids: [1, 2] }, { id: 2, name: 'Group 2' }]),
-            } as unknown as FreshdeskClient;
-            const tools = registerGroupTools(mockClient, mockLogger);
+            };
+            const tools = registerGroupTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'list_groups') await (tool as any).handler({});
             }

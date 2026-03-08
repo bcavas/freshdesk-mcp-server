@@ -41,8 +41,8 @@ describe('Tool Tests: sla-policies.ts', () => {
                     { id: 1, name: 'A', is_default: true, active: true },
                     { id: 2, name: 'B', is_default: false, active: false }
                 ]),
-            } as unknown as FreshdeskClient;
-            const tools = registerSlaPolicyTools(mockClient, mockLogger);
+            };
+            const tools = registerSlaPolicyTools(mockClient as unknown as FreshdeskClient, mockLogger);
             for (const tool of tools) {
                 if (tool.name === 'list_sla_policies') await (tool as any).handler({});
             }
