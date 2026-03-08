@@ -1,11 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import nock from 'nock';
 import { FreshdeskClient } from '../../../src/client/freshdesk-client.js';
 import { RateLimiter } from '../../../src/middleware/rate-limiter.js';
 import { RetryHandler } from '../../../src/middleware/retry.js';
 import { Cache } from '../../../src/middleware/cache.js';
 import { Redactor } from '../../../src/middleware/redactor.js';
-import { FreshdeskApiError } from '../../../src/errors/freshdesk-error.js';
 import type { Config } from '../../../src/config.js';
 import ticketFixtures from '../../fixtures/tickets.json' assert { type: 'json' };
 import pino from 'pino';

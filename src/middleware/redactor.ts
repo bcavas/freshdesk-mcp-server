@@ -7,6 +7,7 @@ export class Redactor {
 
     redact<T extends Record<string, unknown>>(obj: T): T {
         if (Array.isArray(obj)) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return obj.map((item) => this.redact(item)) as unknown as T;
         }
         if (typeof obj !== 'object' || obj === null) {

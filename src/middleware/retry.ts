@@ -27,7 +27,7 @@ export class RetryHandler {
                 await this.sleep(delay);
             }
         }
-        throw lastError;
+        throw lastError ?? new Error('Max retries exceeded');
     }
 
     private isRetryable(err: unknown): boolean {

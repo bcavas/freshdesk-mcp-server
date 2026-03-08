@@ -14,6 +14,7 @@ const mcpServer = createServer(config);
 
 const transports = new Map<string, StreamableHTTPServerTransport>();
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 const httpServer = createHttpServer(async (req, res) => {
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 
@@ -72,7 +73,7 @@ const httpServer = createHttpServer(async (req, res) => {
                 return;
             }
 
-            requestContext.run({ sessionId: sessionId ?? '', traceContext }, async () => {
+            await requestContext.run({ sessionId: sessionId ?? '', traceContext }, async () => {
                 try {
                     await transport.handleRequest(req, res);
                 } catch (e: unknown) {
@@ -90,7 +91,7 @@ const httpServer = createHttpServer(async (req, res) => {
                 res.end(JSON.stringify({ error: 'Missing or invalid session ID' }));
                 return;
             }
-            requestContext.run({ sessionId, traceContext }, async () => {
+            await requestContext.run({ sessionId, traceContext }, async () => {
                 await transports.get(sessionId)!.handleRequest(req, res);
             });
             return;

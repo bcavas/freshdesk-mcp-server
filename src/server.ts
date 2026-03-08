@@ -42,13 +42,14 @@ export function createServer(config?: Config): McpServer {
     logger.info({ toolCount: tools.length, toolsets: cfg.toolsets.enabled }, 'Registering MCP tools');
 
     for (const tool of tools) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
         const inputSchema = (tool.inputSchema as any).shape ?? {};
 
         server.registerTool(
             tool.name,
             {
                 description: tool.description,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 inputSchema,
                 annotations: tool.annotations,
             },

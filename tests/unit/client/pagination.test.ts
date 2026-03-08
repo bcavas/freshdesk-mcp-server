@@ -8,7 +8,6 @@ describe('autoPaginate()', () => {
             { data: [4, 5, 6], hasMore: true },
             { data: [7], hasMore: false },
         ];
-        let callCount = 0;
         const result = await autoPaginate(async (page, _perPage) => {
             return pages[page - 1] ?? { data: [], hasMore: false };
             callCount++;

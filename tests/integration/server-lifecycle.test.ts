@@ -4,8 +4,6 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from '../../src/server.js';
 import type { Config } from '../../src/config.js';
-import ticketFixtures from '../fixtures/tickets.json' assert { type: 'json' };
-import contactFixtures from '../fixtures/contacts.json' assert { type: 'json' };
 
 const testConfig: Config = {
     freshdesk: {

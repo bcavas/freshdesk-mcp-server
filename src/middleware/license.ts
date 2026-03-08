@@ -17,6 +17,7 @@ export class LicenseValidator {
         this.required = required;
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async validate(licenseKey?: string): Promise<LicenseValidationResult> {
         if (!this.required) {
             return { valid: true, tier: 'free' };
