@@ -179,6 +179,20 @@ npm run build
 npm run inspect
 ```
 
+### End-to-End Testing
+
+We provide a comprehensive manual bash script to test the deployed Cloud Run service across all toolsets, verify HTTP validation, security, and (optionally) performance testing with k6. 
+
+```bash
+# Basic run (skips Freshdesk API calls, k6 load testing, and GCP observability checks)
+E2E_SERVICE_URL="https://your-service-url.run.app" ./tests/e2e/run-e2e.sh --skip-functional --skip-perf --skip-observability
+
+# Full run (prompts before creating real test data in Freshdesk)
+./tests/e2e/run-e2e.sh --url "https://your-service-url.run.app"
+```
+
+Use `./tests/e2e/run-e2e.sh --help` to see all available CLI options.
+
 ---
 
 ## Comparison
