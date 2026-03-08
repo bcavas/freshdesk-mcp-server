@@ -3,24 +3,24 @@ import pino from 'pino';
 
 const mockLogger = pino({ level: 'silent' });
 
-describe('Tool Tests: automations.ts', () => {
+describe('Tool Tests: bulk-contacts.ts', () => {
 
-    describe('ListAutomationRulesInputSchema validation', () => {
+    describe('MergeContactsInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { ListAutomationRulesInputSchema } = await import('../../../../src/tools/admin/automations.js');
-            const res = ListAutomationRulesInputSchema.safeParse(null);
+            const { MergeContactsInputSchema } = await import('../../../../src/tools/bulk/bulk-contacts.js');
+            const res = MergeContactsInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { ListAutomationRulesInputSchema } = await import('../../../../src/tools/admin/automations.js');
-            const res = ListAutomationRulesInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { MergeContactsInputSchema } = await import('../../../../src/tools/bulk/bulk-contacts.js');
+            const res = MergeContactsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { ListAutomationRulesInputSchema } = await import('../../../../src/tools/admin/automations.js');
+            const { MergeContactsInputSchema } = await import('../../../../src/tools/bulk/bulk-contacts.js');
             // Assuming empty string or missing required
-            const res = ListAutomationRulesInputSchema.safeParse("");
+            const res = MergeContactsInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {

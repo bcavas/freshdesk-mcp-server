@@ -3,24 +3,24 @@ import pino from 'pino';
 
 const mockLogger = pino({ level: 'silent' });
 
-describe('Tool Tests: bulk-tickets.ts', () => {
+describe('Tool Tests: agents.ts', () => {
 
-    describe('BulkUpdateTicketsInputSchema validation', () => {
+    describe('ListAgentsInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse(null);
+            const { ListAgentsInputSchema } = await import('../../../../src/tools/core/agents.js');
+            const res = ListAgentsInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { ListAgentsInputSchema } = await import('../../../../src/tools/core/agents.js');
+            const res = ListAgentsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { ListAgentsInputSchema } = await import('../../../../src/tools/core/agents.js');
             // Assuming empty string or missing required
-            const res = BulkUpdateTicketsInputSchema.safeParse("");
+            const res = ListAgentsInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {
@@ -31,22 +31,22 @@ describe('Tool Tests: bulk-tickets.ts', () => {
             expect(true).toBe(true);
         });
     });
-    describe('DeleteTicketInputSchema validation', () => {
+    describe('GetAgentInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse(null);
+            const { GetAgentInputSchema } = await import('../../../../src/tools/core/agents.js');
+            const res = GetAgentInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { GetAgentInputSchema } = await import('../../../../src/tools/core/agents.js');
+            const res = GetAgentInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { GetAgentInputSchema } = await import('../../../../src/tools/core/agents.js');
             // Assuming empty string or missing required
-            const res = DeleteTicketInputSchema.safeParse("");
+            const res = GetAgentInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {

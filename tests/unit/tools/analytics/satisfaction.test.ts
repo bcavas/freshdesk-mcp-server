@@ -3,24 +3,24 @@ import pino from 'pino';
 
 const mockLogger = pino({ level: 'silent' });
 
-describe('Tool Tests: bulk-tickets.ts', () => {
+describe('Tool Tests: satisfaction.ts', () => {
 
-    describe('BulkUpdateTicketsInputSchema validation', () => {
+    describe('ListSatisfactionRatingsInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse(null);
+            const { ListSatisfactionRatingsInputSchema } = await import('../../../../src/tools/analytics/satisfaction.js');
+            const res = ListSatisfactionRatingsInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { ListSatisfactionRatingsInputSchema } = await import('../../../../src/tools/analytics/satisfaction.js');
+            const res = ListSatisfactionRatingsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { ListSatisfactionRatingsInputSchema } = await import('../../../../src/tools/analytics/satisfaction.js');
             // Assuming empty string or missing required
-            const res = BulkUpdateTicketsInputSchema.safeParse("");
+            const res = ListSatisfactionRatingsInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {
@@ -31,22 +31,22 @@ describe('Tool Tests: bulk-tickets.ts', () => {
             expect(true).toBe(true);
         });
     });
-    describe('DeleteTicketInputSchema validation', () => {
+    describe('GetTicketSatisfactionInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse(null);
+            const { GetTicketSatisfactionInputSchema } = await import('../../../../src/tools/analytics/satisfaction.js');
+            const res = GetTicketSatisfactionInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { GetTicketSatisfactionInputSchema } = await import('../../../../src/tools/analytics/satisfaction.js');
+            const res = GetTicketSatisfactionInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { GetTicketSatisfactionInputSchema } = await import('../../../../src/tools/analytics/satisfaction.js');
             // Assuming empty string or missing required
-            const res = DeleteTicketInputSchema.safeParse("");
+            const res = GetTicketSatisfactionInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {

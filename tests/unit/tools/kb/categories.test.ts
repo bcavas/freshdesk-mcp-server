@@ -3,24 +3,24 @@ import pino from 'pino';
 
 const mockLogger = pino({ level: 'silent' });
 
-describe('Tool Tests: automations.ts', () => {
+describe('Tool Tests: categories.ts', () => {
 
-    describe('ListAutomationRulesInputSchema validation', () => {
+    describe('ListSolutionCategoriesInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { ListAutomationRulesInputSchema } = await import('../../../../src/tools/admin/automations.js');
-            const res = ListAutomationRulesInputSchema.safeParse(null);
+            const { ListSolutionCategoriesInputSchema } = await import('../../../../src/tools/kb/categories.js');
+            const res = ListSolutionCategoriesInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { ListAutomationRulesInputSchema } = await import('../../../../src/tools/admin/automations.js');
-            const res = ListAutomationRulesInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { ListSolutionCategoriesInputSchema } = await import('../../../../src/tools/kb/categories.js');
+            const res = ListSolutionCategoriesInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { ListAutomationRulesInputSchema } = await import('../../../../src/tools/admin/automations.js');
+            const { ListSolutionCategoriesInputSchema } = await import('../../../../src/tools/kb/categories.js');
             // Assuming empty string or missing required
-            const res = ListAutomationRulesInputSchema.safeParse("");
+            const res = ListSolutionCategoriesInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {

@@ -3,24 +3,24 @@ import pino from 'pino';
 
 const mockLogger = pino({ level: 'silent' });
 
-describe('Tool Tests: bulk-tickets.ts', () => {
+describe('Tool Tests: time-entries.ts', () => {
 
-    describe('BulkUpdateTicketsInputSchema validation', () => {
+    describe('ListTimeEntriesInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse(null);
+            const { ListTimeEntriesInputSchema } = await import('../../../../src/tools/analytics/time-entries.js');
+            const res = ListTimeEntriesInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { ListTimeEntriesInputSchema } = await import('../../../../src/tools/analytics/time-entries.js');
+            const res = ListTimeEntriesInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { ListTimeEntriesInputSchema } = await import('../../../../src/tools/analytics/time-entries.js');
             // Assuming empty string or missing required
-            const res = BulkUpdateTicketsInputSchema.safeParse("");
+            const res = ListTimeEntriesInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {
@@ -31,22 +31,22 @@ describe('Tool Tests: bulk-tickets.ts', () => {
             expect(true).toBe(true);
         });
     });
-    describe('DeleteTicketInputSchema validation', () => {
+    describe('CreateTimeEntryInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse(null);
+            const { CreateTimeEntryInputSchema } = await import('../../../../src/tools/analytics/time-entries.js');
+            const res = CreateTimeEntryInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { CreateTimeEntryInputSchema } = await import('../../../../src/tools/analytics/time-entries.js');
+            const res = CreateTimeEntryInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { CreateTimeEntryInputSchema } = await import('../../../../src/tools/analytics/time-entries.js');
             // Assuming empty string or missing required
-            const res = DeleteTicketInputSchema.safeParse("");
+            const res = CreateTimeEntryInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {

@@ -3,24 +3,24 @@ import pino from 'pino';
 
 const mockLogger = pino({ level: 'silent' });
 
-describe('Tool Tests: bulk-tickets.ts', () => {
+describe('Tool Tests: canned-responses.ts', () => {
 
-    describe('BulkUpdateTicketsInputSchema validation', () => {
+    describe('ListCannedResponsesInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse(null);
+            const { ListCannedResponsesInputSchema } = await import('../../../../src/tools/kb/canned-responses.js');
+            const res = ListCannedResponsesInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = BulkUpdateTicketsInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { ListCannedResponsesInputSchema } = await import('../../../../src/tools/kb/canned-responses.js');
+            const res = ListCannedResponsesInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { BulkUpdateTicketsInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { ListCannedResponsesInputSchema } = await import('../../../../src/tools/kb/canned-responses.js');
             // Assuming empty string or missing required
-            const res = BulkUpdateTicketsInputSchema.safeParse("");
+            const res = ListCannedResponsesInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {
@@ -31,22 +31,22 @@ describe('Tool Tests: bulk-tickets.ts', () => {
             expect(true).toBe(true);
         });
     });
-    describe('DeleteTicketInputSchema validation', () => {
+    describe('GetCannedResponseInputSchema validation', () => {
         it('rejects empty payload (negative test 1)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse(null);
+            const { GetCannedResponseInputSchema } = await import('../../../../src/tools/kb/canned-responses.js');
+            const res = GetCannedResponseInputSchema.safeParse(null);
             expect(res.success).toBe(false);
         });
         it('rejects invalid types (negative test 2)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
-            const res = DeleteTicketInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
+            const { GetCannedResponseInputSchema } = await import('../../../../src/tools/kb/canned-responses.js');
+            const res = GetCannedResponseInputSchema.safeParse({ definitely_invalid_field_1234: 999 });
             // Might be successful if object has no required fields, but testing safeParse functionality
             expect(res).toBeDefined();
         });
         it('rejects bounds (negative test 3)', async () => {
-            const { DeleteTicketInputSchema } = await import('../../../../src/tools/bulk/bulk-tickets.js');
+            const { GetCannedResponseInputSchema } = await import('../../../../src/tools/kb/canned-responses.js');
             // Assuming empty string or missing required
-            const res = DeleteTicketInputSchema.safeParse("");
+            const res = GetCannedResponseInputSchema.safeParse("");
             expect(res.success).toBe(false);
         });
         it('accepts valid structure 1 (positive test)', async () => {

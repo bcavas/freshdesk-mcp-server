@@ -36,9 +36,9 @@ const httpServer = createHttpServer(async (req, res) => {
         // Origin validation (prevent DNS rebinding)
         const origin = req.headers.origin;
         if (origin && !['http://localhost', 'https://localhost'].some(o => origin.startsWith(o))) {
-            // Very strict validation. Extend logically based on deployment footprint.
-            // Using placeholder logic as typical MCP origins vary widely depending on clients.
-            // Typically allow if no origin (backend calls) or matches allowed list
+            res.writeHead(403);
+            res.end('Invalid origin');
+            return;
         }
 
         const traceContext = req.headers['x-cloud-trace-context'] as string | undefined;
