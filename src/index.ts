@@ -9,8 +9,27 @@ import { requestContext } from './context.js';
 
 const errors = new ErrorReporting();
 
-const config = loadConfig();
-const mcpServer = createServer(config);
+// Lazy-initialised after server is already listening — prevents startup crashes
+// from killing the process before /health can respond.
+let mcpServer: ReturnType<typeof createServer> | null = null;
+let configError: string | null = null;
+
+function getMcpServer() {
+    if (mcpServer) return mcpServer;
+    if (configError) return null;
+    try {
+        const config = loadConfig();
+        mcpServer = createServer(config);
+        return mcpServer;
+    } catch (err: unknown) {
+        configError = err instanceof Error ? err.message : String(err);
+        logger.error({ err }, 'Failed to load config / create MCP server');
+        return null;
+    }
+}
+
+const port = parseInt(process.env.PORT ?? '8080', 10);
+const host = process.env.MCP_HOST ?? '0.0.0.0';
 
 const transports = new Map<string, StreamableHTTPServerTransport>();
 
@@ -18,8 +37,18 @@ const transports = new Map<string, StreamableHTTPServerTransport>();
 const httpServer = createHttpServer(async (req, res) => {
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 
-    // Health check endpoint
+    // Health check endpoint — always responds, even if config failed
     if (url.pathname === '/health') {
+        if (configError) {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(
+                JSON.stringify({
+                    status: 'unhealthy',
+                    error: configError,
+                }),
+            );
+            return;
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(
             JSON.stringify({
@@ -33,6 +62,13 @@ const httpServer = createHttpServer(async (req, res) => {
 
     // MCP endpoint
     if (url.pathname === '/mcp') {
+        const server = getMcpServer();
+        if (!server) {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Server initialisation failed', detail: configError }));
+            return;
+        }
+
         // Origin validation (prevent DNS rebinding)
         const origin = req.headers.origin;
         if (origin && !['http://localhost', 'https://localhost'].some(o => origin.startsWith(o))) {
@@ -66,7 +102,7 @@ const httpServer = createHttpServer(async (req, res) => {
                         logger.info({ sessionId: id }, 'MCP session closed');
                     }
                 };
-                await mcpServer.connect(transport);
+                await server.connect(transport);
             } else {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Invalid or unknown session ID' }));
@@ -119,12 +155,13 @@ const httpServer = createHttpServer(async (req, res) => {
     res.end('Not found');
 });
 
-const port = parseInt(process.env.PORT ?? String(config.server.port), 10);
-httpServer.listen(port, config.server.host, () => {
+httpServer.listen(port, host, () => {
     logger.info(
-        { port, host: config.server.host, transport: 'streamable-http' },
+        { port, host, transport: 'streamable-http' },
         'Freshdesk MCP server listening',
     );
+    // Eagerly attempt config load so startup errors surface in logs immediately
+    getMcpServer();
 });
 
 // Graceful shutdown

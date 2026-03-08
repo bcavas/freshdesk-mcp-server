@@ -96,7 +96,7 @@ jobs:
             --role="roles/run.invoker" \
             --project="${{ secrets.GCP_PROJECT_ID }}"
 
-      - name: Get service URL and verify health
+      - name: Get service URL and verify readiness
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} \
             --region="${{ env.REGION }}" \
@@ -104,18 +104,30 @@ jobs:
             --format="value(status.url)")
           echo "SERVICE_URL=${SERVICE_URL}" >> "$GITHUB_ENV"
           echo "### Deployed to ${SERVICE_URL}" >> "$GITHUB_STEP_SUMMARY"
-          
-          # Verify health endpoint
-          echo "==> Verifying health endpoint..."
-          for i in {1..6}; do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${SERVICE_URL}/health" || echo "000")
-            if [ "${STATUS}" = "200" ]; then
-              echo "    Health check passed (attempt ${i})"
-              echo "**Health:** ✅ ${SERVICE_URL}/health" >> "$GITHUB_STEP_SUMMARY"
+
+          # Poll the Cloud Run Ready condition instead of curling the service URL directly.
+          # The service uses internal-and-cloud-load-balancing ingress (no public access),
+          # so direct HTTP health checks from GitHub Actions runners are blocked.
+          # The Cloud Run startup probe already validates /health before setting Ready=True,
+          # making this an equivalent gate that works entirely through the authenticated gcloud API.
+          echo "==> Polling Cloud Run service readiness..."
+          for i in {1..12}; do
+            READY=$(gcloud run services describe ${{ env.SERVICE }} \
+              --region="${{ env.REGION }}" \
+              --project="${{ secrets.GCP_PROJECT_ID }}" \
+              --format="value(status.conditions[?(@.type=='Ready')].status)")
+            if [ "${READY}" = "True" ]; then
+              echo "    Service is Ready (attempt ${i})"
+              echo "**Health:** ✅ Service Ready — ${SERVICE_URL}" >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
-            echo "    Health check attempt ${i} returned HTTP ${STATUS}, retrying in 10s..."
+            echo "    Readiness check attempt ${i}: status=${READY:-Unknown}, retrying in 10s..."
             sleep 10
           done
-          echo "    Health check failed after 6 attempts."
+          echo "    Service did not become Ready after 12 attempts (2 minutes)."
+          gcloud run services describe ${{ env.SERVICE }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --format="yaml(status)" || true
           exit 1
+
