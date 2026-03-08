@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerContactTools } from '../../../../src/tools/core/contacts.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -137,15 +139,32 @@ describe('Tool Tests: contacts.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const fullContact = { id: 1, name: 'Test', email: 'test@example.com', phone: '123', job_title: 'CEO', tags: ['vip'], created_at: '2023' };
+            const minContact = { id: 2, name: 'Min' };
+            const mockClient = {
+                getContact: vi.fn().mockResolvedValue(fullContact),
+                listContacts: vi.fn().mockResolvedValue({ data: [fullContact, minContact], page: 1, has_more: false }),
+                searchContacts: vi.fn().mockResolvedValue({ results: [fullContact, minContact], total: 2 }),
+                updateContact: vi.fn().mockResolvedValue(minContact),
+                createContact: vi.fn().mockResolvedValue(fullContact),
+            } as unknown as FreshdeskClient;
+
+            const tools = registerContactTools(mockClient, mockLogger);
+
+            for (const tool of tools) {
+                if (tool.name === 'get_contact') await (tool as any).handler({ contact_id: 1 });
+                if (tool.name === 'list_contacts') await (tool as any).handler({ page: 1 });
+                if (tool.name === 'search_contacts') await (tool as any).handler({ query: 'test' });
+                if (tool.name === 'update_contact') await (tool as any).handler({ contact_id: 1, name: 'Test' });
+                if (tool.name === 'create_contact') await (tool as any).handler({ name: 'Test', email: 'test@example.com' });
+            }
+
+            expect(mockClient.getContact).toHaveBeenCalled();
+            expect(mockClient.listContacts).toHaveBeenCalled();
+            expect(mockClient.searchContacts).toHaveBeenCalled();
+            expect(mockClient.updateContact).toHaveBeenCalled();
+            expect(mockClient.createContact).toHaveBeenCalled();
         });
     });
 });

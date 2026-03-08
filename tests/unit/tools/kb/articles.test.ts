@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerArticleTools } from '../../../../src/tools/kb/articles.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -163,15 +165,31 @@ describe('Tool Tests: articles.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const fullArticle = { id: 1, title: 'A', status: 2, hits: 5, thumbs_up: 1, thumbs_down: 0, description_text: 'long text' };
+            const minArticle = { id: 2, title: 'B', status: 1, hits: 0, thumbs_up: 0, thumbs_down: 0 };
+            const mockClient = {
+                listSolutionCategories: vi.fn().mockResolvedValue([{ id: 1 }]),
+                listSolutionArticles: vi.fn().mockResolvedValue([fullArticle, minArticle]),
+                getSolutionArticle: vi.fn()
+                    .mockResolvedValueOnce(fullArticle)
+                    .mockResolvedValueOnce(minArticle),
+                createSolutionArticle: vi.fn().mockResolvedValue({ id: 1, title: 'T' }),
+                updateSolutionArticle: vi.fn().mockResolvedValue({ id: 1, title: 'T' }),
+                deleteSolutionArticle: vi.fn().mockResolvedValue(undefined),
+            } as unknown as FreshdeskClient;
+            const tools = registerArticleTools(mockClient, mockLogger);
+            for (const tool of tools) {
+                if (tool.name === 'list_solution_categories') await (tool as any).handler({});
+                if (tool.name === 'list_solution_articles') await (tool as any).handler({ folder_id: 1 });
+                if (tool.name === 'get_solution_article') {
+                    await (tool as any).handler({ article_id: 1 });
+                    await (tool as any).handler({ article_id: 2 });
+                }
+                if (tool.name === 'create_solution_article') await (tool as any).handler({ folder_id: 1, title: 'T', description: 'desc', status: 1 });
+                if (tool.name === 'update_solution_article') await (tool as any).handler({ article_id: 1, title: 'New' });
+                if (tool.name === 'delete_solution_article') await (tool as any).handler({ article_id: 1 });
+            }
         });
     });
 });

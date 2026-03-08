@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerGroupTools } from '../../../../src/tools/admin/groups.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -33,15 +35,15 @@ describe('Tool Tests: groups.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const mockClient = {
+                listGroups: vi.fn().mockResolvedValue([{ id: 1, name: 'Group 1', agent_ids: [1, 2] }, { id: 2, name: 'Group 2' }]),
+            } as unknown as FreshdeskClient;
+            const tools = registerGroupTools(mockClient, mockLogger);
+            for (const tool of tools) {
+                if (tool.name === 'list_groups') await (tool as any).handler({});
+            }
+            expect(mockClient.listGroups).toHaveBeenCalled();
         });
     });
 });

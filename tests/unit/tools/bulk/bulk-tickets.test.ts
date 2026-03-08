@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerBulkTicketTools } from '../../../../src/tools/bulk/bulk-tickets.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -59,15 +61,18 @@ describe('Tool Tests: bulk-tickets.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const mockClient = {
+                bulkUpdateTickets: vi.fn().mockResolvedValue({ job_id: '123' }),
+                deleteTicket: vi.fn().mockResolvedValue(undefined),
+            } as unknown as FreshdeskClient;
+            const tools = registerBulkTicketTools(mockClient, mockLogger);
+            for (const tool of tools) {
+                if (tool.name === 'bulk_update_tickets') await (tool as any).handler({ ticket_ids: [1, 2], status: 4 });
+                if (tool.name === 'delete_ticket') await (tool as any).handler({ ticket_id: 1 });
+            }
+            expect(mockClient.bulkUpdateTickets).toHaveBeenCalled();
+            expect(mockClient.deleteTicket).toHaveBeenCalled();
         });
     });
 });

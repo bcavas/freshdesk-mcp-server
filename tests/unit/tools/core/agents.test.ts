@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerAgentTools } from '../../../../src/tools/core/agents.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -59,15 +61,28 @@ describe('Tool Tests: agents.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const fullAgent = { id: 1, contact: { name: 'Test', email: 'test@example.com' }, type: 'support', available: true, group_ids: [1] };
+            const minAgent = { id: 2, contact: { name: 'A', email: 'e' }, type: 'support', available: false };
+            const mockClient = {
+                getAgent: vi.fn()
+                    .mockResolvedValueOnce(fullAgent)
+                    .mockResolvedValueOnce(minAgent),
+                listAgents: vi.fn().mockResolvedValue({ data: [fullAgent, minAgent], page: 1 }),
+            } as unknown as FreshdeskClient;
+
+            const tools = registerAgentTools(mockClient, mockLogger);
+
+            for (const tool of tools) {
+                if (tool.name === 'get_agent') {
+                    await (tool as any).handler({ agent_id: 1 });
+                    await (tool as any).handler({ agent_id: 2 });
+                }
+                if (tool.name === 'list_agents') await (tool as any).handler({ page: 1 });
+            }
+
+            expect(mockClient.getAgent).toHaveBeenCalledTimes(2);
+            expect(mockClient.listAgents).toHaveBeenCalled();
         });
     });
 });

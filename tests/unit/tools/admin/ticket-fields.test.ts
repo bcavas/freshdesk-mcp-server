@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerTicketFieldTools } from '../../../../src/tools/admin/ticket-fields.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -33,15 +35,18 @@ describe('Tool Tests: ticket-fields.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const mockClient = {
+                listTicketFields: vi.fn().mockResolvedValue([
+                    { id: 1, label: 'L', name: 'N', type: 'default_status', choices: { a: 1 }, default: true, required_for_agents: true },
+                    { id: 2, label: 'M', name: 'O', type: 'custom_text', default: false, required_for_agents: false }
+                ]),
+            } as unknown as FreshdeskClient;
+            const tools = registerTicketFieldTools(mockClient, mockLogger);
+            for (const tool of tools) {
+                if (tool.name === 'list_ticket_fields') await (tool as any).handler({});
+            }
+            expect(mockClient.listTicketFields).toHaveBeenCalled();
         });
     });
 });

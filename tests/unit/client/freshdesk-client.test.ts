@@ -184,5 +184,239 @@ describe('FreshdeskClient', () => {
             const client = createClient();
             await expect(client.getTicket(1)).resolves.toBeDefined();
         });
+        describe('updateTicket()', () => {
+            it('updates a ticket successfully', async () => {
+                nock('https://testcompany.freshdesk.com')
+                    .put('/api/v2/tickets/1')
+                    .reply(200, { id: 1, status: 3 });
+
+                const client = createClient();
+                const result = await client.updateTicket(1, { status: 3 });
+                expect(result.status).toBe(3);
+            });
+        });
+
+        describe('deleteTicket()', () => {
+            it('deletes a ticket successfully', async () => {
+                nock('https://testcompany.freshdesk.com')
+                    .delete('/api/v2/tickets/1')
+                    .reply(204);
+
+                const client = createClient();
+                await expect(client.deleteTicket(1)).resolves.not.toThrow();
+            });
+        });
+
+        describe('bulkUpdateTickets()', () => {
+            it('bulk updates tickets successfully', async () => {
+                nock('https://testcompany.freshdesk.com')
+                    .post('/api/v2/tickets/bulk_update')
+                    .reply(200, { job_id: '123' });
+
+                const client = createClient();
+                const result = await client.bulkUpdateTickets([1, 2], { status: 3 });
+                expect(result).toHaveProperty('job_id', '123');
+            });
+        });
+
+        describe('Conversations', () => {
+            it('listConversations', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/tickets/1/conversations').reply(200, [{ id: 10 }]);
+                const client = createClient();
+                const res = await client.listConversations(1);
+                expect(res).toHaveLength(1);
+            });
+            it('replyToTicket', async () => {
+                nock('https://testcompany.freshdesk.com').post('/api/v2/tickets/1/reply').reply(200, { id: 10 });
+                const client = createClient();
+                const res = await client.replyToTicket(1, { body: 'test' });
+                expect(res.id).toBe(10);
+            });
+            it('addNote', async () => {
+                nock('https://testcompany.freshdesk.com').post('/api/v2/tickets/1/notes').reply(200, { id: 10 });
+                const client = createClient();
+                const res = await client.addNote(1, { body: 'test' });
+                expect(res.id).toBe(10);
+            });
+        });
+
+        describe('Contacts', () => {
+            it('getContact', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/contacts/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getContact(1);
+                expect(res.id).toBe(1);
+            });
+            it('listContacts', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/contacts').query(true).reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listContacts({ page: 1, email: 'test@example.com' });
+                expect(res.data).toHaveLength(1);
+            });
+            it('createContact', async () => {
+                nock('https://testcompany.freshdesk.com').post('/api/v2/contacts').reply(201, { id: 1 });
+                const client = createClient();
+                const res = await client.createContact({ name: 'test' });
+                expect(res.id).toBe(1);
+            });
+            it('updateContact', async () => {
+                nock('https://testcompany.freshdesk.com').put('/api/v2/contacts/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.updateContact(1, { name: 'test' });
+                expect(res.id).toBe(1);
+            });
+            it('searchContacts', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/search/contacts').query(true).reply(200, { results: [{ id: 1 }] });
+                const client = createClient();
+                const res = await client.searchContacts('test');
+                expect(res.results).toHaveLength(1);
+            });
+        });
+
+        describe('Companies', () => {
+            it('getCompany', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/companies/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getCompany(1);
+                expect(res.id).toBe(1);
+            });
+            it('listCompanies', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/companies').query(true).reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listCompanies({ page: 1 });
+                expect(res.data).toHaveLength(1);
+            });
+        });
+
+        describe('Agents & Groups', () => {
+            it('getAgent', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/agents/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getAgent(1);
+                expect(res.id).toBe(1);
+            });
+            it('listAgents', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/agents').query(true).reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listAgents({ state: 'fulltime' });
+                expect(res.data).toHaveLength(1);
+            });
+            it('getCurrentAgent', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/agents/me').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getCurrentAgent();
+                expect(res.id).toBe(1);
+            });
+            it('getGroup', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/groups/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getGroup(1);
+                expect(res.id).toBe(1);
+            });
+            it('listGroups', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/groups').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listGroups();
+                expect(res).toHaveLength(1);
+            });
+        });
+
+        describe('Misc (Solutions, Canned Responses, Time Entries, SLA, etc)', () => {
+            it('listSolutionCategories', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/solutions/categories').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listSolutionCategories();
+                expect(res).toHaveLength(1);
+            });
+            it('listSolutionFolders', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/solutions/categories/1/folders').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listSolutionFolders(1);
+                expect(res).toHaveLength(1);
+            });
+            it('listSolutionArticles', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/solutions/folders/1/articles').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listSolutionArticles(1);
+                expect(res).toHaveLength(1);
+            });
+            it('getSolutionArticle', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/solutions/articles/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getSolutionArticle(1);
+                expect(res.id).toBe(1);
+            });
+            it('createSolutionArticle', async () => {
+                nock('https://testcompany.freshdesk.com').post('/api/v2/solutions/folders/1/articles').reply(201, { id: 1 });
+                const client = createClient();
+                const res = await client.createSolutionArticle(1, { title: 'T', description: 'D', status: 1 });
+                expect(res.id).toBe(1);
+            });
+            it('updateSolutionArticle', async () => {
+                nock('https://testcompany.freshdesk.com').put('/api/v2/solutions/articles/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.updateSolutionArticle(1, { title: 'T2' });
+                expect(res.id).toBe(1);
+            });
+            it('deleteSolutionArticle', async () => {
+                nock('https://testcompany.freshdesk.com').delete('/api/v2/solutions/articles/1').reply(204);
+                const client = createClient();
+                await expect(client.deleteSolutionArticle(1)).resolves.not.toThrow();
+            });
+            it('listCannedResponses', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/canned_responses').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listCannedResponses();
+                expect(res).toHaveLength(1);
+            });
+            it('getCannedResponse', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/canned_responses/1').reply(200, { id: 1 });
+                const client = createClient();
+                const res = await client.getCannedResponse(1);
+                expect(res.id).toBe(1);
+            });
+            it('createCannedResponse', async () => {
+                nock('https://testcompany.freshdesk.com').post('/api/v2/canned_responses').reply(201, { id: 1 });
+                const client = createClient();
+                const res = await client.createCannedResponse({ title: 'T', content: 'C' });
+                expect(res.id).toBe(1);
+            });
+            it('listSatisfactionRatings', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/surveys/satisfaction_ratings').query(true).reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listSatisfactionRatings({ created_since: '2023-01-01T00:00:00Z' });
+                expect(res.data).toHaveLength(1);
+            });
+            it('listTimeEntries', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/tickets/1/time_entries').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listTimeEntries(1);
+                expect(res).toHaveLength(1);
+            });
+            it('createTimeEntry', async () => {
+                nock('https://testcompany.freshdesk.com').post('/api/v2/tickets/1/time_entries').reply(201, { id: 1 });
+                const client = createClient();
+                const res = await client.createTimeEntry(1, { time_spent: '01:00', agent_id: 123 });
+                expect(res.id).toBe(1);
+            });
+            it('listSlaPolicies', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/sla_policies').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listSlaPolicies();
+                expect(res).toHaveLength(1);
+            });
+            it('listTicketFields', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/ticket_fields').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listTicketFields();
+                expect(res).toHaveLength(1);
+            });
+            it('listAutomationRules', async () => {
+                nock('https://testcompany.freshdesk.com').get('/api/v2/automations/ticket_creation').reply(200, [{ id: 1 }]);
+                const client = createClient();
+                const res = await client.listAutomationRules('ticket_creation');
+                expect(res).toHaveLength(1);
+            });
+        });
     });
 });

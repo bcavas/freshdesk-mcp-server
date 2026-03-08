@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerTimeEntryTools } from '../../../../src/tools/analytics/time-entries.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -59,15 +61,24 @@ describe('Tool Tests: time-entries.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const mockClient = {
+                listTimeEntries: vi.fn().mockResolvedValue([
+                    { id: 1, time_spent: '01:30' },
+                    { id: 2, time_spent: '02' }
+                ]),
+                createTimeEntry: vi.fn().mockResolvedValue({ id: 1 }),
+            } as unknown as FreshdeskClient;
+            const tools = registerTimeEntryTools(mockClient, mockLogger);
+            for (const tool of tools) {
+                if (tool.name === 'list_time_entries') await (tool as any).handler({ ticket_id: 1 });
+                if (tool.name === 'create_time_entry') {
+                    await (tool as any).handler({ ticket_id: 1, time_spent: '01:00', agent_id: 1, billable: true });
+                    await (tool as any).handler({ ticket_id: 1, time_spent: '01:00', agent_id: 1, billable: false });
+                }
+            }
+            expect(mockClient.listTimeEntries).toHaveBeenCalled();
+            expect(mockClient.createTimeEntry).toHaveBeenCalledTimes(2);
         });
     });
 });

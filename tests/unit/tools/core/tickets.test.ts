@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerTicketTools } from '../../../../src/tools/core/tickets.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -163,15 +165,32 @@ describe('Tool Tests: tickets.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const fullTicket = { id: 1, subject: 'A', status: 2, priority: 1, group_id: 1, responder_id: 2, description_text: 'desc', type: 'Question', tags: ['a'], created_at: '2023', due_by: '2023-01-01', fr_due_by: '2023-01-01' };
+            const minTicket = { id: 2, subject: 'B', status: 6, priority: 6, created_at: '2023' };
+            const mockClient = {
+                getTicket: vi.fn().mockResolvedValue(fullTicket),
+                listTickets: vi.fn().mockResolvedValue({ data: [fullTicket, minTicket], page: 1, has_more: false }),
+                searchTickets: vi.fn().mockResolvedValue({ results: [fullTicket, minTicket], total: 2 }),
+                updateTicket: vi.fn().mockResolvedValue(minTicket),
+                createTicket: vi.fn().mockResolvedValue(minTicket),
+            } as unknown as FreshdeskClient;
+
+            const tools = registerTicketTools(mockClient, mockLogger);
+
+            for (const tool of tools) {
+                if (tool.name === 'get_ticket') await (tool as any).handler({ ticket_id: 1 });
+                if (tool.name === 'list_tickets') await (tool as any).handler({ filter: 'all_tickets', page: 1, per_page: 30 });
+                if (tool.name === 'search_tickets') await (tool as any).handler({ query: 'test', page: 1 });
+                if (tool.name === 'update_ticket') await (tool as any).handler({ ticket_id: 1, status: 2 });
+                if (tool.name === 'create_ticket') await (tool as any).handler({ subject: 'Test', description: 'Desc', email: 'test@example.com' });
+            }
+
+            expect(mockClient.getTicket).toHaveBeenCalled();
+            expect(mockClient.listTickets).toHaveBeenCalled();
+            expect(mockClient.searchTickets).toHaveBeenCalled();
+            expect(mockClient.updateTicket).toHaveBeenCalled();
+            expect(mockClient.createTicket).toHaveBeenCalled();
         });
     });
 });

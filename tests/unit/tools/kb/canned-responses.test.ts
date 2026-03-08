@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerCannedResponseTools } from '../../../../src/tools/kb/canned-responses.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -59,15 +61,19 @@ describe('Tool Tests: canned-responses.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const mockClient = {
+                listCannedResponses: vi.fn().mockResolvedValue([{ id: 1, title: 'Test Response', content: 'Hello' }, { id: 2, title: 'Other', content: 'Nope' }]),
+                getCannedResponse: vi.fn().mockResolvedValue({ id: 1, title: 'T', content: 'C' }),
+            } as unknown as FreshdeskClient;
+            const tools = registerCannedResponseTools(mockClient, mockLogger);
+            for (const tool of tools) {
+                if (tool.name === 'list_canned_responses') {
+                    await (tool as any).handler({});
+                    await (tool as any).handler({ search_term: 'test' });
+                }
+                if (tool.name === 'get_canned_response') await (tool as any).handler({ response_id: 1 });
+            }
         });
     });
 });

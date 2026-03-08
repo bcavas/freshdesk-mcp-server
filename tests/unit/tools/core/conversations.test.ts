@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import pino from 'pino';
+import { registerConversationTools } from '../../../../src/tools/core/conversations.js';
+import type { FreshdeskClient } from '../../../../src/client/freshdesk-client.js';
 
 const mockLogger = pino({ level: 'silent' });
 
@@ -85,15 +87,27 @@ describe('Tool Tests: conversations.ts', () => {
     });
 
     describe('Handler Logic and Errors', () => {
-        it('executes without crashing on valid dependencies', async () => {
-            expect(true).toBe(true);
-        });
-        
-        it('returns correctly mapped errors containing isError: true when failing', async () => {
-            // B-TEST-5 requirement representation
-            const mockClient = {};
-            const isError = true;
-            expect(isError).toBe(true);
+        it('executes tools with mock client', async () => {
+            const mockClient = {
+                listConversations: vi.fn().mockResolvedValue([{ id: 1 }]),
+                replyToTicket: vi.fn().mockResolvedValue({ id: 1 }),
+                addNote: vi.fn().mockResolvedValue({ id: 1 }),
+            } as unknown as FreshdeskClient;
+
+            const tools = registerConversationTools(mockClient, mockLogger);
+
+            for (const tool of tools) {
+                if (tool.name === 'list_conversations') await (tool as any).handler({ ticket_id: 1 });
+                if (tool.name === 'reply_to_ticket') await (tool as any).handler({ ticket_id: 1, body: 'test' });
+                if (tool.name === 'add_note') {
+                    await (tool as any).handler({ ticket_id: 1, body: 'test', private: true });
+                    await (tool as any).handler({ ticket_id: 1, body: 'test', private: false });
+                }
+            }
+
+            expect(mockClient.listConversations).toHaveBeenCalled();
+            expect(mockClient.replyToTicket).toHaveBeenCalled();
+            expect(mockClient.addNote).toHaveBeenCalledTimes(2);
         });
     });
 });
