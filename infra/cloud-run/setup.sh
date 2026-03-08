@@ -111,6 +111,12 @@ gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
   --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_PROVIDER%/providers/*}/attribute.repository/${GITHUB_REPO}" \
   --project="${PROJECT_ID}"
 
+# Allow GitHub Actions to generate access tokens for the service account
+gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
+  --role="roles/iam.serviceAccountTokenCreator" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_PROVIDER%/providers/*}/attribute.repository/${GITHUB_REPO}" \
+  --project="${PROJECT_ID}"
+
 # Grant service account permissions to deploy Cloud Run and push images
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${SA_EMAIL}" \
