@@ -120,9 +120,10 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${SA_EMAIL}" \
   --role="roles/artifactregistry.writer"
 
-gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
   --member="serviceAccount:${SA_EMAIL}" \
-  --role="roles/iam.serviceAccountUser"
+  --role="roles/iam.serviceAccountUser" \
+  --project="${PROJECT_ID}"
 
 echo ""
 echo "==> Setup complete. Add these values as GitHub Actions secrets:"
