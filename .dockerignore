@@ -10,7 +10,6 @@ infra/
 .github/
 *.test.ts
 *.spec.ts
-tsup.config.ts
 vitest.config.ts
 .eslintrc.*
 .prettierrc
