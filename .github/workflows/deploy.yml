@@ -115,7 +115,8 @@ jobs:
             READY=$(gcloud run services describe ${{ env.SERVICE }} \
               --region="${{ env.REGION }}" \
               --project="${{ secrets.GCP_PROJECT_ID }}" \
-              --format="value(status.conditions[?(@.type=='Ready')].status)")
+              --format=json \
+              | jq -r '.status.conditions[] | select(.type=="Ready") | .status // "Unknown"')
             if [ "${READY}" = "True" ]; then
               echo "    Service is Ready (attempt ${i})"
               echo "**Health:** ✅ Service Ready — ${SERVICE_URL}" >> "$GITHUB_STEP_SUMMARY"
@@ -125,9 +126,10 @@ jobs:
             sleep 10
           done
           echo "    Service did not become Ready after 12 attempts (2 minutes)."
+          echo "    Full status conditions:"
           gcloud run services describe ${{ env.SERVICE }} \
             --region="${{ env.REGION }}" \
             --project="${{ secrets.GCP_PROJECT_ID }}" \
-            --format="yaml(status)" || true
+            --format=json | jq '.status.conditions' || true
           exit 1
 
