@@ -3,19 +3,24 @@ kind: Service
 metadata:
   name: freshdesk-mcp-server
   annotations:
-    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress: internal-and-cloud-load-balancing
 spec:
   template:
     metadata:
       annotations:
         # Scale to zero when idle; start on first request
-        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/minScale: "1"
+        # Max scale maps to Freshdesk downstream API rate limits
         autoscaling.knative.dev/maxScale: "3"
         # Session affinity: route requests from same client to same instance
         # Required for stateful MCP sessions; harmless for stateless mode
         run.googleapis.com/sessionAffinity: "true"
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/startup-cpu-boost: "true"
     spec:
+      # Concurrency tuned for tool I/O mapping bounded payloads
       containerConcurrency: 80
+      # Timeout aligns to max batch processing allowance on bulk tools
       timeoutSeconds: 3600
       serviceAccountName: freshdesk-mcp-sa@PROJECT_ID.iam.gserviceaccount.com
       containers:

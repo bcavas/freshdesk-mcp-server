@@ -59,9 +59,9 @@ export const UpdateTicketInputSchema = z
         priority: z.nativeEnum(TicketPriority).optional(),
         group_id: z.number().int().positive().optional(),
         responder_id: z.number().int().positive().optional(),
-        type: z.string().optional(),
-        tags: z.array(z.string()).optional(),
-        custom_fields: z.record(z.string(), z.unknown()).optional(),
+        type: z.string().max(255).optional(),
+        tags: z.array(z.string().max(100)).max(50).optional(),
+        custom_fields: z.record(z.string().max(100), z.unknown()).optional(),
     })
     .refine(
         (data) => {
@@ -83,12 +83,12 @@ export const CreateTicketInputSchema = z
         requester_id: z.number().int().positive().optional(),
         priority: z.nativeEnum(TicketPriority).optional().default(TicketPriority.Low),
         status: z.nativeEnum(TicketStatus).optional().default(TicketStatus.Open),
-        type: z.string().optional(),
+        type: z.string().max(255).optional(),
         group_id: z.number().int().positive().optional(),
         responder_id: z.number().int().positive().optional(),
-        tags: z.array(z.string()).optional(),
-        cc_emails: z.array(z.string().email()).optional(),
-        custom_fields: z.record(z.string(), z.unknown()).optional(),
+        tags: z.array(z.string().max(100)).max(50).optional(),
+        cc_emails: z.array(z.string().email().max(255)).max(20).optional(),
+        custom_fields: z.record(z.string().max(100), z.unknown()).optional(),
     })
     .refine((data) => data.email || data.requester_id, {
         message: 'Either email or requester_id is required',

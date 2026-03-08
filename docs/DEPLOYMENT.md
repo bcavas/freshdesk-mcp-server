@@ -83,6 +83,35 @@ Every pull request triggers `.github/workflows/ci.yml`:
 - Lint, typecheck, test coverage, build
 - Docker build validation (builder stage only, no push)
 
+## Rollback Procedure
+
+If a bad deployment reaches production, you should immediately rollback to the previous stable revision.
+
+### Step 1: List Revisions
+```bash
+gcloud run revisions list --service=freshdesk-mcp-server --region=YOUR_REGION
+```
+Identify the revision ID you want to restore. Note that `PREVIOUS` can be used generally if you only want to step back exactly 1 revision.
+
+### Step 2: Route Traffic
+To rollback all 100% of traffic to the previous revision:
+```bash
+gcloud run services update-traffic freshdesk-mcp-server \
+  --to-revisions=PREVIOUS=100 \
+  --region=YOUR_REGION
+```
+
+If you need a specific older revision:
+```bash
+gcloud run services update-traffic freshdesk-mcp-server \
+  --to-revisions=freshdesk-mcp-server-0000X-XXX=100 \
+  --region=YOUR_REGION
+```
+
+### Step 3: Verify Integrity
+Check logs and metrics to ensure traffic is flowing properly to the stable revision and errors have receded.
+
+
 ## Local Testing with Docker
 
 ```bash

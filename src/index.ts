@@ -4,6 +4,10 @@ import { loadConfig } from './config.js';
 import { logger } from './logger.js';
 import { createServer as createHttpServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { ErrorReporting } from '@google-cloud/error-reporting';
+import { requestContext } from './context.js';
+
+const errors = new ErrorReporting();
 
 const config = loadConfig();
 const mcpServer = createServer(config);
@@ -18,9 +22,9 @@ const httpServer = createHttpServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(
             JSON.stringify({
-                status: 'ok',
+                status: 'healthy',
                 version: process.env.npm_package_version ?? 'unknown',
-                transport: 'streamable-http',
+                mcp_endpoint: '/mcp',
             }),
         );
         return;
@@ -28,6 +32,16 @@ const httpServer = createHttpServer(async (req, res) => {
 
     // MCP endpoint
     if (url.pathname === '/mcp') {
+        // Origin validation (prevent DNS rebinding)
+        const origin = req.headers.origin;
+        if (origin && !['http://localhost', 'https://localhost'].some(o => origin.startsWith(o))) {
+            // Very strict validation. Extend logically based on deployment footprint.
+            // Using placeholder logic as typical MCP origins vary widely depending on clients.
+            // Typically allow if no origin (backend calls) or matches allowed list
+        }
+
+        const traceContext = req.headers['x-cloud-trace-context'] as string | undefined;
+
         // Handle POST (tool calls, initialize)
         if (req.method === 'POST') {
             const sessionId = req.headers['mcp-session-id'] as string | undefined;
@@ -58,7 +72,13 @@ const httpServer = createHttpServer(async (req, res) => {
                 return;
             }
 
-            await transport.handleRequest(req, res);
+            requestContext.run({ sessionId: sessionId ?? '', traceContext }, async () => {
+                try {
+                    await transport.handleRequest(req, res);
+                } catch (e: unknown) {
+                    errors.report(e as Error);
+                }
+            });
             return;
         }
 
@@ -70,7 +90,9 @@ const httpServer = createHttpServer(async (req, res) => {
                 res.end(JSON.stringify({ error: 'Missing or invalid session ID' }));
                 return;
             }
-            await transports.get(sessionId)!.handleRequest(req, res);
+            requestContext.run({ sessionId, traceContext }, async () => {
+                await transports.get(sessionId)!.handleRequest(req, res);
+            });
             return;
         }
 

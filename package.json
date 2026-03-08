@@ -47,6 +47,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/error-reporting": "^3.0.5",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "dotenv": "^17.3.1",
     "pino": "^10.3.1",
