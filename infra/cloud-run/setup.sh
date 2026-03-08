@@ -76,8 +76,15 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/run.invoker"
 
 # 7. Create Workload Identity Federation for GitHub Actions (keyless auth)
-# Replace GITHUB_ORG/REPO with your actual GitHub repository
-GITHUB_REPO="${GITHUB_REPO:-YOUR_GITHUB_ORG/freshdesk-mcp-server}"
+# GITHUB_REPO must be set before running this script, e.g.:
+#   GITHUB_REPO="bcavas/freshdesk-mcp-server" bash setup.sh
+if [[ -z "${GITHUB_REPO:-}" ]]; then
+  echo "ERROR: GITHUB_REPO environment variable is required."
+  echo "  Set it before running this script, e.g.:"
+  echo "  GITHUB_REPO=\"<your-github-org>/<your-repo>\" bash setup.sh"
+  exit 1
+fi
+
 POOL_NAME="github-actions-pool"
 PROVIDER_NAME="github-provider"
 
