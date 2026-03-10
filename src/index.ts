@@ -15,12 +15,11 @@ let mcpServer: ReturnType<typeof createServer> | null = null;
 let configError: string | null = null;
 
 function getMcpServer() {
-    if (mcpServer) return mcpServer;
     if (configError) return null;
     try {
         const config = loadConfig();
-        mcpServer = createServer(config);
-        return mcpServer;
+        const sessionServer = createServer(config);
+        return sessionServer;
     } catch (err: unknown) {
         configError = err instanceof Error ? err.message : String(err);
         logger.error({ err }, 'Failed to load config / create MCP server');
@@ -39,6 +38,11 @@ const httpServer = createHttpServer(async (req, res) => {
 
     // Health check endpoint — always responds, even if config failed
     if (url.pathname === '/health') {
+        if (req.method !== 'GET') {
+            res.writeHead(405, { Allow: 'GET', 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Method not allowed' }));
+            return;
+        }
         if (configError) {
             res.writeHead(503, { 'Content-Type': 'application/json' });
             res.end(
@@ -102,7 +106,13 @@ const httpServer = createHttpServer(async (req, res) => {
                         logger.info({ sessionId: id }, 'MCP session closed');
                     }
                 };
-                await server.connect(transport);
+                const sessionServer = getMcpServer();
+                if (!sessionServer) {
+                    res.writeHead(503, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Server initialization failed' }));
+                    return;
+                }
+                await sessionServer.connect(transport);
             } else {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Invalid or unknown session ID' }));

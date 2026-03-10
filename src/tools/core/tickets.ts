@@ -16,9 +16,8 @@ export const GetTicketInputSchema = z.object({
 
 export const ListTicketsInputSchema = z.object({
     filter: z
-        .enum(['new_and_my_open', 'watching', 'spam', 'deleted', 'all_tickets'])
+        .enum(['new_and_my_open', 'watching', 'spam', 'deleted'])
         .optional()
-        .default('all_tickets')
         .describe('Predefined ticket filter'),
     page: z.number().int().min(1).optional().default(1),
     per_page: z.number().int().min(1).max(100).optional().default(30),

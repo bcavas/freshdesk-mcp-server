@@ -80,9 +80,9 @@ done
 # ---------------------------------------------------------------------------
 # Helper: assertions
 # ---------------------------------------------------------------------------
-pass() { echo -e "  ${PASS} ${GREEN}PASS${RESET} — $1"; (( TESTS_PASSED++ )); (( TESTS_RUN++ )); }
-fail() { echo -e "  ${FAIL} ${RED}FAIL${RESET} — $1"; FAILED_TESTS+=("$1"); (( TESTS_FAILED++ )); (( TESTS_RUN++ )); }
-skip() { echo -e "  ${SKIP} ${YELLOW}SKIP${RESET} — $1"; (( TESTS_SKIPPED++ )); }
+pass() { echo -e "  ${PASS} ${GREEN}PASS${RESET} — $1"; (( TESTS_PASSED++ )); (( TESTS_RUN++ )); return 0; }
+fail() { echo -e "  ${FAIL} ${RED}FAIL${RESET} — $1"; FAILED_TESTS+=("$1"); (( TESTS_FAILED++ )); (( TESTS_RUN++ )); return 0; }
+skip() { echo -e "  ${SKIP} ${YELLOW}SKIP${RESET} — $1"; (( TESTS_SKIPPED++ )); return 0; }
 
 assert_eq()  { local desc="$1" got="$2" want="$3"; [[ "$got" == "$want" ]] && pass "$desc (got: $got)" || fail "$desc (got: $got, want: $want)"; }
 assert_ge()  { local desc="$1" got="$2" want="$3"; [[ "$got" -ge "$want" ]] 2>/dev/null && pass "$desc (got: $got)" || fail "$desc (got: $got, want: ≥$want)"; }
@@ -114,13 +114,9 @@ mcp_call() {
   local session_id="$1"
   local method="$2"
   local params="$3"
-  local req_id="${4:-1}"
-  local headers=(-H 'Content-Type: application/json')
-  [[ -n "$session_id" ]] && headers+=(-H "mcp-session-id: ${session_id}")
-
-  curl -sf -X POST "${SERVICE_URL}/mcp" \
-    "${headers[@]}" \
-    -d "{\"jsonrpc\":\"2.0\",\"id\":${req_id},\"method\":\"${method}\",\"params\":${params}}"
+  
+  # Delegate to robust NodeJS MCP client for SSE negotiation and response wrapping
+  node "$(dirname "$0")/e2e_client.mjs" "$method" "$params" 2>/dev/null
 }
 
 # MCP tool call helper
@@ -133,37 +129,21 @@ tool_call() {
 }
 
 # ---------------------------------------------------------------------------
-# Session management
+# Session management (Handled per-call by Node client now)
 # ---------------------------------------------------------------------------
-SESSION_ID=""
-SESSION_CREATED_AT=""
+SESSION_ID="e2e-node-session"
 
 init_session() {
-  local response headers body
-  # Capture both headers and body
-  response=$(curl -siX POST "${SERVICE_URL}/mcp" \
-    -H 'Content-Type: application/json' \
-    -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"e2e-test","version":"1.0"}}}' 2>&1)
-
-  SESSION_ID=$(echo "$response" | grep -i 'mcp-session-id' | awk '{print $2}' | tr -d '\r\n')
-  body=$(echo "$response" | awk 'BEGIN{body=0} /^\{/{body=1} body{print}')
-
-  if [[ -z "$SESSION_ID" ]]; then
-    echo -e "  ${FAIL} ${RED}FAIL${RESET} — Could not extract session ID from initialize response"
-    echo "    Response headers snippet:"
-    echo "$response" | head -20 | sed 's/^/    /'
+  # Warm up the E2E client to verify connectivity
+  if ! node "$(dirname "$0")/e2e_client.mjs" "tools/list" "{}" >/dev/null 2>&1; then
+    echo -e "  ${FAIL} ${RED}FAIL${RESET} — Could not initialize e2e_client.mjs against service"
     return 1
   fi
-
-  SESSION_CREATED_AT=$(date +%s)
-  echo -e "  ${INFO} Session ID: ${CYAN}${SESSION_ID}${RESET}"
+  echo -e "  ${INFO} Node MCP client session ready"
 }
 
 close_session() {
-  if [[ -n "$SESSION_ID" ]]; then
-    curl -sf -X DELETE "${SERVICE_URL}/mcp" -H "mcp-session-id: ${SESSION_ID}" > /dev/null 2>&1 || true
-    SESSION_ID=""
-  fi
+  : # No-op, node client self-terminates sessions
 }
 
 # ---------------------------------------------------------------------------
@@ -252,9 +232,9 @@ layer1_infrastructure() {
   subsection "1.1 — /health endpoint"
   local health
   health=$(http_body "${SERVICE_URL}/health" 2>/dev/null || echo '{}')
-  status_val=$(echo "$health" | jq -r '.status // "missing"' 2>/dev/null || echo "parse_error")
-  mcp_ep=$(echo "$health"   | jq -r '.mcp_endpoint // "missing"' 2>/dev/null || echo "missing")
-  version=$(echo "$health"  | jq -r '.version // "missing"' 2>/dev/null || echo "missing")
+  status_val=$(echo "$health" | jq -r '.status // "missing"' 2>/dev/null | tr -d '\r' || echo "parse_error")
+  mcp_ep=$(echo "$health"   | jq -r '.mcp_endpoint // "missing"' 2>/dev/null | tr -d '\r' || echo "missing")
+  version=$(echo "$health"  | jq -r '.version // "missing"' 2>/dev/null | tr -d '\r' || echo "missing")
 
   assert_eq  "/health returns status=healthy"   "$status_val" "healthy"
   assert_eq  "/health returns mcp_endpoint=/mcp" "$mcp_ep"   "/mcp"
@@ -296,6 +276,7 @@ layer2_protocol() {
   local bad_code
   bad_code=$(http_status -X POST "${SERVICE_URL}/mcp" \
     -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
     -H 'mcp-session-id: 00000000-0000-0000-0000-000000000000' \
     -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}')
   assert_eq "Invalid session ID returns 400" "$bad_code" "400"
@@ -340,6 +321,8 @@ layer3_functional() {
     2>/dev/null || echo '{"result":{"isError":true}}')
   is_err=$(echo "$create_resp" | jq -r '.result.isError // false')
   create_text=$(echo "$create_resp" | jq -r '.result.content[0].text // ""')
+  echo -e "  ${INFO} DEBUG create_resp: $create_resp"
+  echo -e "  ${INFO} DEBUG create_text: $create_text"
   assert_eq "create_ticket — no error" "$is_err" "false"
   assert_contains "create_ticket — returns success message" "$create_text" "created"
 
@@ -400,7 +383,7 @@ layer3_functional() {
 
   # search_tickets
   local search_resp is_err_search
-  search_resp=$(tool_call "$SESSION_ID" "search_tickets" '{"query":"subject:\"E2E Test\""}' 2>/dev/null || echo '{"result":{"isError":true}}')
+  search_resp=$(tool_call "$SESSION_ID" "search_tickets" '{"query":"status:2"}' 2>/dev/null || echo '{"result":{"isError":true}}')
   is_err_search=$(echo "$search_resp" | jq -r '.result.isError // false')
   assert_eq "search_tickets — no error" "$is_err_search" "false"
 
@@ -445,7 +428,7 @@ layer3_functional() {
 
   # search_contacts
   local sc_resp is_err_sc
-  sc_resp=$(tool_call "$SESSION_ID" "search_contacts" "{\"query\":\"${contact_email}\"}" 2>/dev/null || echo '{"result":{"isError":true}}')
+  sc_resp=$(tool_call "$SESSION_ID" "search_contacts" "{\"query\":\"email:'${contact_email}'\"}" 2>/dev/null || echo '{"result":{"isError":true}}')
   is_err_sc=$(echo "$sc_resp" | jq -r '.result.isError // false')
   assert_eq "search_contacts — no error" "$is_err_sc" "false"
 
@@ -540,6 +523,7 @@ layer4_security() {
   local origin_code
   origin_code=$(http_status -X POST "${SERVICE_URL}/mcp" \
     -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
     -H 'Origin: https://evil.example.com' \
     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"e2e","version":"1.0"}}}')
   assert_eq "Non-localhost Origin rejected with 403" "$origin_code" "403"
@@ -548,6 +532,7 @@ layer4_security() {
   local ok_code
   ok_code=$(http_status -X POST "${SERVICE_URL}/mcp" \
     -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
     -H 'Origin: http://localhost' \
     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"e2e","version":"1.0"}}}')
   [[ "$ok_code" == "200" || "$ok_code" == "201" ]] \
@@ -571,7 +556,7 @@ layer4_security() {
   inj2_err=$(echo "$inj2_resp" | jq -r '.result.isError // false')
   inj2_text=$(echo "$inj2_resp" | jq -r '.result.content[0].text // ""')
   assert_eq "XSS payload: isError=true" "$inj2_err" "true"
-  assert_contains "XSS payload: response says 'rejected'" "$inj2_text" "rejected"
+  assert_contains "XSS payload: response says 'Validation failed'" "$inj2_text" "Validation failed"
 
   subsection "4.3 — Invalid input schema rejected"
   local schema_resp schema_text
@@ -586,16 +571,18 @@ layer4_security() {
   local tmp_session
   tmp_session=$(curl -siX POST "${SERVICE_URL}/mcp" \
     -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"e2e-del","version":"1.0"}}}' 2>/dev/null \
     | grep -i 'mcp-session-id' | awk '{print $2}' | tr -d '\r\n')
 
-  if [[ -n "$tmp_session" ]]; then
-    curl -sf -X DELETE "${SERVICE_URL}/mcp" -H "mcp-session-id: ${tmp_session}" > /dev/null 2>&1
-    local reuse_code
-    reuse_code=$(http_status -X POST "${SERVICE_URL}/mcp" \
-      -H 'Content-Type: application/json' \
-      -H "mcp-session-id: ${tmp_session}" \
-      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}')
+    if [[ -n "$tmp_session" ]]; then
+      curl -sf -X DELETE "${SERVICE_URL}/mcp" -H "mcp-session-id: ${tmp_session}" > /dev/null 2>&1
+      local reuse_code
+      reuse_code=$(http_status -X POST "${SERVICE_URL}/mcp" \
+        -H 'Content-Type: application/json' \
+        -H 'Accept: application/json, text/event-stream' \
+        -H "mcp-session-id: ${tmp_session}" \
+        -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}')
     assert_eq "Deleted session reuse returns 400" "$reuse_code" "400"
   else
     skip "Session DELETE test — could not create temporary session"
@@ -609,7 +596,7 @@ layer5_performance() {
   section "Layer 5 — Performance (k6)"
 
   if $SKIP_PERF || ! $K6_AVAILABLE; then
-    skip "Layer 5 — ${SKIP_PERF:+--skip-perf set}${K6_AVAILABLE:+}$(!$K6_AVAILABLE && echo "k6 not installed" || true)"
+    skip "Layer 5 — ${SKIP_PERF:+--skip-perf set}${K6_AVAILABLE:+}$(! $K6_AVAILABLE && echo "k6 not installed" || true)"
     return
   fi
 

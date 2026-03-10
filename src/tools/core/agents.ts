@@ -7,9 +7,8 @@ import type { Agent } from '../../client/types.js';
 
 export const ListAgentsInputSchema = z.object({
     state: z
-        .enum(['fulltime', 'occasional', 'all'])
+        .enum(['fulltime', 'occasional'])
         .optional()
-        .default('all')
         .describe('Agent type filter'),
     group_id: z.number().int().positive().optional().describe('Filter by group ID'),
     page: z.number().int().min(1).optional().default(1),
