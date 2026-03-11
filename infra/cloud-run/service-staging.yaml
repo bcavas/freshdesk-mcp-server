@@ -42,8 +42,6 @@ spec:
           env:
             - name: NODE_ENV
               value: "staging"
-            - name: PORT
-              value: "8080"
             - name: MCP_TRANSPORT
               value: "streamable-http"
             - name: LOG_LEVEL
