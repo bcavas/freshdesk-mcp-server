@@ -1,6 +1,16 @@
 node_modules/
 dist/
+# Secrets — never commit these
 .env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+*.pem
+*.key
+*_credentials.json
+service-account*.json
+gcp-key*.json
 *.log
 coverage/
 .turbo/

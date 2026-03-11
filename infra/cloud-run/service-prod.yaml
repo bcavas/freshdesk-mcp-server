@@ -1,0 +1,74 @@
+# ─────────────────────────────────────────────────────────────────────
+# BEFORE USING THIS FILE: Replace these placeholders with real values:
+#   YOUR_PROJECT_ID  → your GCP project ID (e.g., freshdesk-mcp-prod-123)
+#   us-central1      → your GCP region if different
+# The serviceAccountName SA must be created manually in GCP first.
+# See docs/RUNBOOK.md → Manual Setup Steps.
+# ─────────────────────────────────────────────────────────────────────
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: freshdesk-mcp-server-prod
+  annotations:
+    # Same as staging for now — no load balancer until revenue justifies ~$18/month cost.
+    # When ready to add a load balancer, change to: internal-and-cloud-load-balancing
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # minScale 0 keeps cost at zero until paying users arrive.
+        # Change to "1" when first paying customer onboards to eliminate cold starts.
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        # REQUIRED for SSE/Streamable HTTP transport — do not remove.
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/startup-cpu-boost: "true"
+        run.googleapis.com/sessionAffinity: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: freshdesk-mcp-runtime-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com
+      containers:
+        - image: us-central1-docker.pkg.dev/YOUR_PROJECT_ID/freshdesk-mcp-server/app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "8080"
+            - name: MCP_TRANSPORT
+              value: "streamable-http"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: FRESHDESK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: freshdesk-api-key
+                  key: latest
+            - name: FRESHDESK_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: freshdesk-domain
+                  key: latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 15
+            failureThreshold: 3
+  traffic:
+    - percent: 100
+      latestRevision: true

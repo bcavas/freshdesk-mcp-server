@@ -1,0 +1,81 @@
+# ─────────────────────────────────────────────────────────────────────
+# BEFORE USING THIS FILE: Replace these placeholders with real values:
+#   YOUR_PROJECT_ID  → your GCP project ID (e.g., freshdesk-mcp-prod-123)
+#   us-central1      → your GCP region if different
+# The serviceAccountName SA must be created manually in GCP first.
+# See docs/RUNBOOK.md → Manual Setup Steps.
+# ─────────────────────────────────────────────────────────────────────
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: freshdesk-mcp-server-staging
+  annotations:
+    # Direct internet access — no load balancer needed for staging.
+    # Staging URL is not shared publicly so WAF is not required.
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # minScale 0 = no cost when idle. Cold starts (2–8s) are acceptable in staging.
+        autoscaling.knative.dev/minScale: "0"
+        # Low cap to prevent runaway costs during testing.
+        autoscaling.knative.dev/maxScale: "3"
+        # REQUIRED for SSE/Streamable HTTP transport — do not remove.
+        # CPU throttling breaks streaming connections mid-session.
+        run.googleapis.com/cpu-throttling: "false"
+        # Reduces cold start latency at no extra cost.
+        run.googleapis.com/startup-cpu-boost: "true"
+        # Best-effort: routes same client to same instance via cookie.
+        run.googleapis.com/sessionAffinity: "true"
+    spec:
+      # 80 concurrent requests per instance — correct for I/O-bound Freshdesk API calls.
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      # Replace YOUR_PROJECT_ID with your GCP project ID.
+      # This SA must exist in GCP — see Manual Steps in docs/RUNBOOK.md.
+      serviceAccountName: freshdesk-mcp-runtime-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com
+      containers:
+        - image: us-central1-docker.pkg.dev/YOUR_PROJECT_ID/freshdesk-mcp-server/app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NODE_ENV
+              value: "staging"
+            - name: PORT
+              value: "8080"
+            - name: MCP_TRANSPORT
+              value: "streamable-http"
+            - name: LOG_LEVEL
+              value: "debug"
+            # Secrets injected from Secret Manager — never plaintext values here.
+            - name: FRESHDESK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: freshdesk-api-key
+                  key: latest
+            - name: FRESHDESK_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: freshdesk-domain
+                  key: latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 15
+            failureThreshold: 3
+  traffic:
+    - percent: 100
+      latestRevision: true
