@@ -57,6 +57,11 @@ spec:
                 secretKeyRef:
                   name: freshdesk-domain
                   key: latest
+            - name: MCP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-api-key
+                  key: latest
           resources:
             limits:
               cpu: "1"

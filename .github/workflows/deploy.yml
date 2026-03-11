@@ -53,10 +53,22 @@ jobs:
       - name: Deploy to staging
         run: |
           # Substitute the image tag in service-staging.yaml and deploy
-          sed -i "s|image: .*freshdesk-mcp-server/app:.*|image: ${{ env.IMAGE }}|" \
+          sed -i "s|image: .*freshdesk-mcp-server/app:.*|image: $IMAGE|" \
             infra/cloud-run/service-staging.yaml
           gcloud run services replace infra/cloud-run/service-staging.yaml \
             --region=${{ env.REGION }}
+
+          # Allow unauthenticated invocations (required for MCP clients without GCP auth).
+          # Cloud Run requires authentication by default — this binding must be set explicitly.
+          gcloud run services add-iam-policy-binding freshdesk-mcp-server-staging \
+            --region=${{ env.REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker"
+
+          # IAM policy changes propagate asynchronously in Cloud Run's data plane.
+          # Without this wait the health check below races against propagation and gets 403.
+          echo "Waiting 30s for IAM policy to propagate..."
+          sleep 30
 
       - name: Verify staging health
         run: |
@@ -64,17 +76,23 @@ jobs:
             --region=${{ env.REGION }} \
             --format="value(status.url)")
           echo "Staging URL: $STAGING_URL"
-          # Retry up to 5 times to allow for cold start
-          for i in {1..5}; do
-            curl -sf "$STAGING_URL/health" && break || sleep 5
+          # Retry up to 12 times (60s) to handle cold start + residual IAM propagation delay
+          for i in {1..12}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/health")
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check passed on attempt $i (HTTP 200)"
+              break
+            fi
+            echo "Attempt $i: HTTP $STATUS — retrying in 5s..."
+            sleep 5
           done
           curl -f "$STAGING_URL/health"
           echo "STAGING_URL=$STAGING_URL" >> $GITHUB_ENV
 
       - name: Print staging MCP endpoint
         run: |
-          echo "✅ Staging deployed: ${{ env.STAGING_URL }}/mcp"
-          echo "   Test with: npx @modelcontextprotocol/inspector ${{ env.STAGING_URL }}/mcp"
+          echo "✅ Staging deployed: $STAGING_URL/mcp"
+          echo "   Test with: npx @modelcontextprotocol/inspector $STAGING_URL/mcp"
 
   # ── Production deploy (manual trigger only, requires approval) ────
   promote-to-prod:
@@ -110,10 +128,21 @@ jobs:
 
       - name: Deploy to production
         run: |
-          sed -i "s|image: .*freshdesk-mcp-server/app:.*|image: ${{ env.STAGING_IMAGE }}|" \
+          sed -i "s|image: .*freshdesk-mcp-server/app:.*|image: $STAGING_IMAGE|" \
             infra/cloud-run/service-prod.yaml
           gcloud run services replace infra/cloud-run/service-prod.yaml \
             --region=${{ env.REGION }}
+
+          # Allow unauthenticated invocations (required for MCP clients without GCP auth).
+          # Cloud Run requires authentication by default — this binding must be set explicitly.
+          gcloud run services add-iam-policy-binding freshdesk-mcp-server-prod \
+            --region=${{ env.REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker"
+
+          # IAM policy changes propagate asynchronously — wait before health check.
+          echo "Waiting 30s for IAM policy to propagate..."
+          sleep 30
 
       - name: Verify production health
         run: |
@@ -121,8 +150,15 @@ jobs:
             --region=${{ env.REGION }} \
             --format="value(status.url)")
           echo "Production URL: $PROD_URL"
-          for i in {1..5}; do
-            curl -sf "$PROD_URL/health" && break || sleep 5
+          # Retry up to 12 times (60s) to handle cold start + residual IAM propagation delay
+          for i in {1..12}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL/health")
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check passed on attempt $i (HTTP 200)"
+              break
+            fi
+            echo "Attempt $i: HTTP $STATUS — retrying in 5s..."
+            sleep 5
           done
           curl -f "$PROD_URL/health"
           echo "✅ Production deployed: $PROD_URL/mcp"

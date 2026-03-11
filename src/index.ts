@@ -28,6 +28,9 @@ function getMcpServer() {
 
 const port = parseInt(process.env.PORT ?? '8080', 10);
 const host = process.env.MCP_HOST ?? '0.0.0.0';
+// When set, all /mcp requests must supply a matching x-api-key header.
+// /health is intentionally exempt so Cloud Run probes continue to work.
+const mcpApiKey = process.env.MCP_API_KEY || null;
 
 const transports = new Map<string, StreamableHTTPServerTransport>();
 
@@ -65,6 +68,15 @@ const httpServer = createHttpServer(async (req, res) => {
 
     // MCP endpoint
     if (url.pathname === '/mcp') {
+        if (mcpApiKey) {
+            const provided = req.headers['x-api-key'];
+            if (!provided || provided !== mcpApiKey) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Unauthorized: missing or invalid x-api-key header' }));
+                return;
+            }
+        }
+
         const server = getMcpServer();
         if (!server) {
             res.writeHead(503, { 'Content-Type': 'application/json' });
