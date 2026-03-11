@@ -31,6 +31,6 @@ export default tseslint.config(
         },
     },
     {
-        ignores: ['dist/', 'node_modules/', 'tests/performance/**/*.js']
+        ignores: ['dist/', 'node_modules/', 'tests/performance/**/*.js', 'tests/e2e/e2e_client.mjs']
     }
 );

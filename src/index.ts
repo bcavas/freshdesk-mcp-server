@@ -11,7 +11,6 @@ const errors = new ErrorReporting();
 
 // Lazy-initialised after server is already listening — prevents startup crashes
 // from killing the process before /health can respond.
-let mcpServer: ReturnType<typeof createServer> | null = null;
 let configError: string | null = null;
 
 function getMcpServer() {
