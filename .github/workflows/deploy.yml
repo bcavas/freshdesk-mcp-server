@@ -12,9 +12,9 @@ on:
         default: false
 
 env:
-  PROJECT_ID: YOUR_PROJECT_ID
+  PROJECT_ID: freshdesk-mcp-server
   REGION: us-central1
-  REGISTRY: us-central1-docker.pkg.dev/YOUR_PROJECT_ID/freshdesk-mcp-server
+  REGISTRY: us-central1-docker.pkg.dev/freshdesk-mcp-server/freshdesk-mcp-server
 
 jobs:
   # ── Staging deploy (runs on every merge to main) ──────────────────

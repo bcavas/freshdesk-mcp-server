@@ -34,9 +34,9 @@ spec:
       timeoutSeconds: 300
       # Replace YOUR_PROJECT_ID with your GCP project ID.
       # This SA must exist in GCP — see Manual Steps in docs/RUNBOOK.md.
-      serviceAccountName: freshdesk-mcp-runtime-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com
+      serviceAccountName: freshdesk-mcp-runtime-sa@freshdesk-mcp-server.iam.gserviceaccount.com
       containers:
-        - image: us-central1-docker.pkg.dev/YOUR_PROJECT_ID/freshdesk-mcp-server/app:latest
+        - image: us-central1-docker.pkg.dev/freshdesk-mcp-server/freshdesk-mcp-server/app:latest
           ports:
             - containerPort: 8080
           env:
