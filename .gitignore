@@ -14,3 +14,5 @@ gcp-key*.json
 *.log
 coverage/
 .turbo/
+# Claude Code local settings — machine-specific, may accumulate personal config
+.claude/settings.local.json

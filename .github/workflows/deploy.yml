@@ -11,17 +11,18 @@ on:
         required: true
         default: false
 
-env:
-  PROJECT_ID: freshdesk-mcp-server
-  REGION: us-central1
-  REGISTRY: us-central1-docker.pkg.dev/freshdesk-mcp-server/freshdesk-mcp-server
-
 jobs:
   # ── Staging deploy (runs on every merge to main) ──────────────────
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+
+    # PROJECT_ID and REGISTRY reference secrets — cannot be set at workflow level.
+    # GCP_PROJECT_ID must be added as a GitHub Actions secret (Settings → Secrets → Actions).
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REGION: us-central1
 
     permissions:
       contents: read
@@ -45,14 +46,16 @@ jobs:
 
       - name: Build and push image
         run: |
-          IMAGE="${{ env.REGISTRY }}/app:${{ github.sha }}"
+          REGISTRY="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/freshdesk-mcp-server"
+          IMAGE="$REGISTRY/app:${{ github.sha }}"
           docker build -t "$IMAGE" .
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
       - name: Deploy to staging
         run: |
-          # Substitute the image tag in service-staging.yaml and deploy
+          # Substitute placeholders in the service manifest with real values
+          sed -i "s|YOUR_PROJECT_ID|${{ env.PROJECT_ID }}|g" infra/cloud-run/service-staging.yaml
           sed -i "s|image: .*freshdesk-mcp-server/app:.*|image: $IMAGE|" \
             infra/cloud-run/service-staging.yaml
           gcloud run services replace infra/cloud-run/service-staging.yaml \
@@ -101,6 +104,11 @@ jobs:
     if: github.event.inputs.promote_to_prod == 'true'
     environment: production  # Requires manual approval — configure in GitHub Settings
 
+    # GCP_PROJECT_ID must be added as a GitHub Actions secret (Settings → Secrets → Actions).
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REGION: us-central1
+
     permissions:
       contents: read
       id-token: write
@@ -128,6 +136,8 @@ jobs:
 
       - name: Deploy to production
         run: |
+          # Substitute placeholders in the service manifest with real values
+          sed -i "s|YOUR_PROJECT_ID|${{ env.PROJECT_ID }}|g" infra/cloud-run/service-prod.yaml
           sed -i "s|image: .*freshdesk-mcp-server/app:.*|image: $STAGING_IMAGE|" \
             infra/cloud-run/service-prod.yaml
           gcloud run services replace infra/cloud-run/service-prod.yaml \

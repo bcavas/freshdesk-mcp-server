@@ -80,7 +80,7 @@ const httpServer = createHttpServer(async (req, res) => {
         const server = getMcpServer();
         if (!server) {
             res.writeHead(503, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Server initialisation failed', detail: configError }));
+            res.end(JSON.stringify({ error: 'Server initialisation failed' }));
             return;
         }
 
@@ -120,7 +120,7 @@ const httpServer = createHttpServer(async (req, res) => {
                 const sessionServer = getMcpServer();
                 if (!sessionServer) {
                     res.writeHead(503, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Server initialization failed' }));
+                    res.end(JSON.stringify({ error: 'Service unavailable' }));
                     return;
                 }
                 await sessionServer.connect(transport);
