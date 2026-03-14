@@ -9,7 +9,7 @@ spec:
     metadata:
       annotations:
         # Scale to zero when idle; start on first request
-        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/minScale: "0"
         # Max scale maps to Freshdesk downstream API rate limits
         autoscaling.knative.dev/maxScale: "3"
         # Session affinity: route requests from same client to same instance

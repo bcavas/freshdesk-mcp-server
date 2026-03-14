@@ -97,6 +97,20 @@ jobs:
           echo "✅ Staging deployed: $STAGING_URL/mcp"
           echo "   Test with: npx @modelcontextprotocol/inspector $STAGING_URL/mcp"
 
+      - name: Clean up old Artifact Registry images
+        run: |
+          REGISTRY="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/freshdesk-mcp-server/app"
+          # Delete images not tagged with 'latest' that are older than 7 days
+          CUTOFF=$(date -d '7 days ago' --utc +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -v-7d -u +%Y-%m-%dT%H:%M:%SZ)
+          gcloud artifacts docker images list "$REGISTRY" \
+            --include-tags \
+            --format="get(IMAGE, VERSION)" \
+            --filter="createTime < '$CUTOFF' AND -tags:latest AND -tags:prod" \
+          | while read -r image digest; do
+            echo "Deleting old image: $image@$digest"
+            gcloud artifacts docker images delete "$image@$digest" --quiet || true
+          done
+
   # ── Production deploy (manual trigger only, requires approval) ────
   promote-to-prod:
     name: Promote to Production
